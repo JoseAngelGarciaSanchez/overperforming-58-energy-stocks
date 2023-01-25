@@ -352,10 +352,12 @@ if __name__ == "__main__":
     for i in companies_list:
         output_path = f"/Users/JAGS/Documents/GitHub/Twitter-WebScraping/webscraped_{'_'.join(i.split())}.csv"
         print(f"Scrapping: {i} in twitter")
-        TwitterScrapper(research=i, link=link, output_path=output_path, start_date="2017-10-31", end_date="2022-07-31", verbose=False, mail="mosefdatascience@gmail.com", username="mosefdata", password="MosefDataScience@").launch()
+        TwitterScrapper(research=i, link=link, output_path=output_path, start_date="2017-10-31", end_date="2022-09-30", verbose=False, mail="mosefdatascience@gmail.com", username="mosefdata", password="MosefDataScience@").launch()
         print(f"{i} webscrapped")
     print("finished")
 
 # verbose avec des prints
 # definir le mdp et username -> if not normal research
 # travailler la liste de inputs au lieu de la boucle avec des inputs uniques et faire une option --update pour updater les fichiers qui ont déjà été webscrappés
+# start date: 2017-10-31
+# end date: 2022-09-30
