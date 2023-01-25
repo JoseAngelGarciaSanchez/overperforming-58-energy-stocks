@@ -11,7 +11,7 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 Changer le df et faire un path relative et mettre la data dans son propre dossier  
 """
 
-class Preprocessing:
+class PreprocessorPipeline:
     
     def __init__(self, path, output_path):
         self.path = path
@@ -28,7 +28,9 @@ class Preprocessing:
         .cache()) # Keep the dataframe in memory for faster processing 
         return df
 
-    def change_type_column(self, df):
+    def cast_columns(self, df):
+        """ Cast good columns types 
+        """
         print('Changing the type of columns')
         df = df.select(*[col(c).cast("integer").alias(c) if c in ['ReplyCount','RetweetCount','LikeCount'] else c for c in df.columns])
         df = df.withColumn("PostDate", to_date(df["PostDate"]))
@@ -55,6 +57,10 @@ class Preprocessing:
         print('Loosing the @ for the handles')
         df = df.withColumn("Handle", trim(regexp_replace("Handle", "@", "")))
         return df
+
+
+
+        
     def creating_csv(self, df, output_path):
         print('Creating the cleaned csv!')
         df.write.format("csv").mode("overwrite").save(self.output_path)
@@ -64,9 +70,9 @@ class Preprocessing:
 if __name__ == "__main__":
     path = "/Users/sarrabenyahia/Documents/GitHub/NLP_stocks/Data/webscraped_VALERO_ENERGY_CORP.csv"
     output_path = "/Users/sarrabenyahia/Documents/GitHub/NLP_stocks/Data/processed_df.csv"
-    preprocessing = Preprocessing(path =path, output_path=output_path)
+    preprocessing = PreprocessorPipeline(path =path, output_path=output_path)
     df = preprocessing.import_df(path)
-    df = preprocessing.change_type_column(df)
+    df = preprocessing.cast_columns(df)
     df = preprocessing.cleaning_tweets(df)
     df = preprocessing.dealing_with_na(df)
     df = preprocessing.loosing_handle(df)
