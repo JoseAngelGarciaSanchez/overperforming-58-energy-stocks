@@ -1,7 +1,9 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-from pyspark.sql import functions as F
+from transformers import pipeline
+import pandas as pd
+
 import logging
 logging.getLogger("py4j").setLevel(logging.ERROR)
 
@@ -45,6 +47,7 @@ class PreprocessorPipeline:
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
         df = df.withColumn("TweetText", regexp_extract("TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
         df = df.withColumn("TweetText", regexp_replace("TweetText", "[^a-zA-Z\\s]", ""))
+
         df = df.na.drop(subset="TweetText") 
         return df
 
@@ -58,9 +61,25 @@ class PreprocessorPipeline:
         df = df.withColumn("Handle", trim(regexp_replace("Handle", "@", "")))
         return df
 
+    # def translator(self, df):
+    #     # Load pre-trained models for text translation and language detection
+    #     translate_model = pipeline('translation', model='t5-base')
+    #     detect_lang_model = pipeline('text-classification', model='distilbert-base-multilingual-cased')
 
+    #     # Define a UDF to translate text using the pre-trained models
+    #     translate_text_udf = udf(lambda x: translate_text(x))
 
-        
+    #            # function to translate text
+    #     def translate_text(text_to_translate):
+    #          # Detect the source language of the text
+    #         src_lang = detect_lang_model(text_to_translate)[0]['label']
+    #         # Translate the text
+    #         return translate_model(text_to_translate, src_lang=src_lang, tgt_lang='en')[0]['generated_text']
+
+    #     # Use the UDF to add a new column with the translations
+    #     df = df.withColumn("translated_text", translate_text_udf("TweetText"))
+    #     return df
+
     def creating_csv(self, df, output_path):
         print('Creating the cleaned csv!')
         df.write.format("csv").mode("overwrite").save(self.output_path)
@@ -76,6 +95,7 @@ if __name__ == "__main__":
     df = preprocessing.cleaning_tweets(df)
     df = preprocessing.dealing_with_na(df)
     df = preprocessing.loosing_handle(df)
+    df = preprocessing.translator(df)
     preprocessing.creating_csv(df, output_path)
     print("Here is the result :) ")
     df.show()
