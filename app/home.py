@@ -46,7 +46,7 @@ for i, stock in enumerate(stock_list):
     elif i == 6:
         c7.image(Image.open(logo_path))
 
-st.subheader('Methodology')
+st.subheader("Methodology")
 st.write(
     """    
     Improving the performance of 58 energy stocks. 
@@ -56,9 +56,9 @@ st.write(
     """
 )
 
-st.subheader('Results')
+st.subheader("Results")
 
-st.subheader('About us')
+st.subheader("About us")
 # -- Aknowledgments
 c1, c2 = st.columns(2)
 with c1:
