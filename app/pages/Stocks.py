@@ -6,12 +6,13 @@ import plotly.graph_objects as go
 import plotly.subplots as sp
 
 # Layout
-st.set_page_config(page_title='Stock Analysis', page_icon=':bar_chart:', layout='wide')
-st.title('💸 Stock Analysis based on returns')
+st.set_page_config(page_title="Stock Analysis", page_icon=":bar_chart:", layout="wide")
+st.title("💸 Stock Analysis based on returns")
 
 # Global Variables
 DATE_COLUMN = "DATE"
 DATA_PATH = "./../data/stocks_data.xlsx"
+
 
 @st.cache
 def load_data():
@@ -25,6 +26,7 @@ def load_data():
     data.drop(columns="DATE1", inplace=True)
     data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN]).dt.date
     return data
+
 
 # Load data into the dataframe
 data = load_data()
@@ -187,14 +189,14 @@ filtered_df = data.loc[mask, :]
 stocks_df = filtered_df[stocks]
 
 # # ----- Reporting
-m1, m2, m3, m4, m5 = st.columns((1,1,1,1,1))
+m1, m2, m3, m4, m5 = st.columns((1, 1, 1, 1, 1))
 
 total_returns = stocks_df.drop(columns=DATE_COLUMN).sum(axis=1)
 
-m1.write('')
-m2.metric(label ='Number of selected stocks:', value = str(len(stocks)-1))
-m3.metric(label ='Total Returns for Portfolio', value = str(round(sum(total_returns),1)))
-m1.write('')
+m1.write("")
+m2.metric(label="Number of selected stocks:", value=str(len(stocks) - 1))
+m3.metric(label="Total Returns for Portfolio", value=str(round(sum(total_returns), 1)))
+m1.write("")
 
 # ---- Plot
 st.dataframe(filtered_df[stocks])
