@@ -73,7 +73,6 @@ class PreprocessorPipeline:
                 return detect(text) == 'en'
             except:
                 return False
-
         df_pd = df_pd[df_pd['TweetText'].apply(detect_en)]
         spark = SparkSession.builder.appName("CSVtoTable").getOrCreate()
         df= spark.createDataFrame(df_pd) 
@@ -87,8 +86,8 @@ class PreprocessorPipeline:
 
 
 if __name__ == "__main__":
-    path = "/Users/pepegarcia/Documents/GitHub/NLP_stocks/Data/webscraped_ENERGY_TRANSFER_LP.csv"
-    output_path = "/Users/pepegarcia/Documents/GitHub/NLP_stocks/Data/processed_df.csv"
+    path = "/Users/sarrabenyahia/Documents/GitHub/overperforming-58-energy-stocks/webscraped_WEYERHAEUSER_CO1.csv"
+    output_path = "/Users/sarrabenyahia/Documents/GitHub/overperforming-58-energy-stocks/processed_df.csv"
     preprocessing = PreprocessorPipeline(path =path, output_path=output_path)
     df = preprocessing.import_df(path)
     df = preprocessing.cast_columns(df)
