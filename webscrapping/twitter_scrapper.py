@@ -352,9 +352,9 @@ if __name__ == "__main__":
     companies_string = "VIPER ENERGY PARTNERS LP,SUNOCO LP,WESTROCK CO,PEMBINA PIPELINE CORP,ALCOA CORP,ARCELORMITTAL,NUTRIEN LTD,NUTRIEN LTD,DOW INC,CORTEVA INC,OCCIDENTAL PETROLEUM CORP,ONEOK INC,CHEVRON CORP,PIONEER NATURAL RESOURCES CO,TARGA RESOURCES CORP,SCHLUMBERGER LTD,BAKER HUGHES CO,DEVON ENERGY CORP,HESS CORP,MARATHON OIL CORP,WILLIAMS COS INC,COTERRA ENERGY INC,APA CORP,EOG RESOURCES INC,KINDER MORGAN INC,EQT CORP,HALLIBURTON CO,DIAMONDBACK ENERGY INC"
     companies_list = companies_string.split(",")
     for i in companies_list:
-        output_path = f"/Users/pepegarcia/Documents/GitHub/Twitter-WebScraping/webscraped_{'_'.join(i.split())}.csv"
+        output_path = f"/Users/sarrabenyahia/Documents/GitHub/NLP_STOCKS/Data/webscraped_{'_'.join(i.split())}.csv"
         print(f"Scrapping: {i} in twitter")
-        TwitterScrapper(research=i, link=link, output_path=output_path, start_date="2017-10-31", end_date="2022-09-30", verbose=False, mail="mosefdatascience@gmail.com", username="mosefdata", password="MosefDataScience@").launch()
+        TwitterScrapper(research=i, link=link, output_path=output_path, start_date="2017-10-31", end_date="2019-14-10", verbose=False, mail="mosefdatascience@gmail.com", username="mosefdata", password="MosefDataScience@").launch()
         print(f"{i} webscrapped")
     print("finished")
 
