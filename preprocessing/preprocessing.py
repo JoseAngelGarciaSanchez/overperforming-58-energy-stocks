@@ -2,13 +2,13 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-
-from pyspark import SparkContext, SparkConf
-
 import pandas as pd
-from textblob import TextBlob
+from langdetect import detect
 
+import nltk
 
+nltk.download('punkt')
+nltk.download('perluniprops')
 
 
 """TODO :
@@ -30,6 +30,7 @@ class PreprocessorPipeline:
         .options(header = True, inferSchema = True, sep=",",multiLine=True)
         .load(self.path)
         .cache()) # Keep the dataframe in memory for faster processing 
+        #print(df.count())
         return df
 
     def cast_columns(self, df):
@@ -56,25 +57,28 @@ class PreprocessorPipeline:
     def dealing_with_na(self, df):
         print('Dealing with na values')
         df = df.na.fill(0, subset=['ReplyCount','RetweetCount','LikeCount'])
+        df = df.dropna(subset=["TweetText"])
         return df
 
     def loosing_handle(self, df):
         print('Loosing the @ for the handles')
         df = df.withColumn("Handle", trim(regexp_replace("Handle", "@", "")))
         return df
-    
 
 
+    def filtering_english(self, df):
+        df_pd = df.toPandas()
+        def detect_en(text):  
+            try:
+                return detect(text) == 'en'
+            except:
+                return False
 
-    def translate_df(self, df):
-        translate_udf = udf(lambda x: str(TextBlob(x).translate(to='en')))
-        df = df.withColumn("translated_column", translate_udf("TweetText"))
+        df_pd = df_pd[df_pd['TweetText'].apply(detect_en)]
+        spark = SparkSession.builder.appName("CSVtoTable").getOrCreate()
+        df= spark.createDataFrame(df_pd) 
 
         return df
-
-
-
-
 
     def creating_csv(self, df, output_path):
         print('Creating the cleaned csv!')
@@ -83,18 +87,18 @@ class PreprocessorPipeline:
 
 
 if __name__ == "__main__":
-    path = "/Users/sarrabenyahia/Documents/GitHub/NLP_stocks/Data/webscraped_VALERO_ENERGY_CORP.csv"
-    output_path = "/Users/sarrabenyahia/Documents/GitHub/NLP_stocks/Data/processed_df.csv"
+    path = "/Users/pepegarcia/Documents/GitHub/NLP_stocks/Data/webscraped_ENERGY_TRANSFER_LP.csv"
+    output_path = "/Users/pepegarcia/Documents/GitHub/NLP_stocks/Data/processed_df.csv"
     preprocessing = PreprocessorPipeline(path =path, output_path=output_path)
     df = preprocessing.import_df(path)
     df = preprocessing.cast_columns(df)
     df = preprocessing.cleaning_tweets(df)
     df = preprocessing.dealing_with_na(df)
     df = preprocessing.loosing_handle(df)
-    df = preprocessing.translate_df(df)
-    #preprocessing.creating_csv(df, output_path)
-    #print("Here is the result :) ")
+    df = preprocessing.filtering_english(df)
+    preprocessing.creating_csv(df, output_path)
+    print("Here is the result :) ")
     df.show()
-
+    #print(df.count())
 
 
