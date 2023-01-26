@@ -100,5 +100,3 @@ if __name__ == "__main__":
     print("Here is the result :) ")
     df.show()
     #print(df.count())
-
-
