@@ -4,7 +4,8 @@ from pyspark.sql.types import *
 from langdetect import detect
 import nltk
 import sys
-from nltk.stem.porter import PorterStemmer
+import re
+
 
 nltk.download('punkt')
 nltk.download('perluniprops')
@@ -59,8 +60,7 @@ class PreprocessorPipeline:
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[\n]+", " ")))
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "@[^ ]+", "")))
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
-        df = df.withColumn("TweetText", regexp_replace(
-            "TweetText", "[^a-zA-Z\\s]", ""))
+        df = df.withColumn("TweetText", regexp_replace("TweetText", "[^a-zA-Z\\s]", ""))
 
         #URLs
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "https?://[^ ]+", "")))
@@ -73,10 +73,15 @@ class PreprocessorPipeline:
             "TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
 
         # Spliting by word boundaries
-        df = df.withColumn("TweetText", regexp_compile("TweetText","\W+"))
+        def remove_non_word(text):
+            pattern = re.compile(r"\W+")
+            return pattern.sub(" ", text)
+
+        remove_non_word_udf = udf(remove_non_word)
+        df = df.withColumn("TweetText", remove_non_word_udf("TweetText"))
 
         # Repeating words like hurrrryyyyyy
-        df = df.withColum,("TweetText", regexp_compile("TweetText", "(.)\1{1,}", re.IGNORECASE))
+        df = df.withColum("TweetText", regexp_replace("TweetText", "(.)\1{1,}", re.IGNORECASE))
 
         #Dropping duplicates
         df = df.dropDuplicates(["TweetText"])
@@ -91,7 +96,7 @@ class PreprocessorPipeline:
         print('---Dealing with na values...')
         #Filling 0 for int columns
         df = df.na.fill(0, subset=['ReplyCount', 'RetweetCount', 'LikeCount'])
-        
+
         #Dropping empty tweets
         df = df.dropna(subset=["TweetText"])
 
