@@ -38,8 +38,10 @@ class PreprocessorPipeline:
         """
         print('---Changing the type of columns...')
 
+        #Casting integers
         df = df.select(*[col(c).cast("integer").alias(c) if c in ['ReplyCount',
                        'RetweetCount', 'LikeCount'] else c for c in df.columns])
+        #Casting dates
         df = df.withColumn("PostDate", to_date(df["PostDate"]))
 
         return df
@@ -50,21 +52,33 @@ class PreprocessorPipeline:
         """
         print('---Cleaning the tweets with regex...')
 
-        df=df.withColumn("TweetText", lower(col("TweetText")))
-        df = df.withColumn("TweetText", trim(
-            regexp_replace("TweetText", "[\n]+", " ")))
-        df = df.withColumn("TweetText", trim(
-            regexp_replace("TweetText", "https?://[^ ]+", "")))
-        df = df.withColumn("TweetText", trim(
-            regexp_replace("TweetText", "@[^ ]+", "")))
-        df = df.withColumn("TweetText", trim(
-            regexp_replace("TweetText", "#[^ ]+", "")))
-        df = df.withColumn("TweetText", trim(
-            regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
-        df = df.withColumn("TweetText", regexp_extract(
-            "TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
+        #Lowering all characters
+        df= df.withColumn("TweetText", lower(col("TweetText")))
+
+        #Deleting special characters
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[\n]+", " ")))
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "@[^ ]+", "")))
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
         df = df.withColumn("TweetText", regexp_replace(
             "TweetText", "[^a-zA-Z\\s]", ""))
+
+        #URLs
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "https?://[^ ]+", "")))
+ 
+        #Deleting hashtags
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "#[^ ]+", "")))
+
+        #Keeping only the text part of the tweeys
+        df = df.withColumn("TweetText", regexp_extract(
+            "TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
+
+        # Spliting by word boundaries
+        df = df.withColumn("TweetText", regexp_compile("TweetText","\W+"))
+
+        # Repeating words like hurrrryyyyyy
+        df = df.withColum,("TweetText", regexp_compile("TweetText", "(.)\1{1,}", re.IGNORECASE))
+
+        #Dropping duplicates
         df = df.dropDuplicates(["TweetText"])
 
         return df
@@ -75,8 +89,10 @@ class PreprocessorPipeline:
         """
 
         print('---Dealing with na values...')
-
+        #Filling 0 for int columns
         df = df.na.fill(0, subset=['ReplyCount', 'RetweetCount', 'LikeCount'])
+        
+        #Dropping empty tweets
         df = df.dropna(subset=["TweetText"])
 
         return df
@@ -130,9 +146,8 @@ if __name__ == "__main__":
     df = preprocessing.cast_columns(df)
     df = preprocessing.filtering_english(df)
     df = preprocessing.cleaning_tweets(df)
-    df = preprocessing.dealing_with_na(df)
     df = preprocessing.loosing_handle(df)
-
+    df = preprocessing.dealing_with_na(df)
     preprocessing.creating_csv(df)
 
     print("Here is the result :) ")
