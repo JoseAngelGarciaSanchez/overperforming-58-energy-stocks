@@ -154,10 +154,10 @@ if __name__ == "__main__":
     preprocessing = PreprocessorPipeline(path=path, output_path=output_path)
     df = preprocessing.import_df(path)
     df = preprocessing.cast_columns(df)
-    df = preprocessing.filtering_english(df)
     df = preprocessing.cleaning_tweets(df)
-    df = preprocessing.loosing_handle(df)
     df = preprocessing.dealing_with_na(df)
+    df = preprocessing.loosing_handle(df)
+    df = preprocessing.filtering_english(df)
     preprocessing.creating_csv(df)
 
     print("Here is the result :) ")
