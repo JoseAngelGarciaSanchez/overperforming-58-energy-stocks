@@ -68,7 +68,7 @@ class PreprocessorPipeline:
         #Deleting hashtags
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "#[^ ]+", "")))
 
-        #Keeping only the text part of the tweeys
+        #Keeping only the text part of the tweets
         df = df.withColumn("TweetText", regexp_extract(
             "TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
 
@@ -81,7 +81,12 @@ class PreprocessorPipeline:
         df = df.withColumn("TweetText", remove_non_word_udf("TweetText"))
 
         # Repeating words like hurrrryyyyyy
-        df = df.withColumn("TweetText", regexp_replace("TweetText", "(.)\1{1,}", re.IGNORECASE))
+        rpt_regex = re.compile(r"(.)\1{1,}", re.IGNORECASE)
+        def rpt_repl(match):
+            return match.group(1)+match.group(1)
+
+        rpt_udf = udf(lambda x: re.sub(rpt_regex,rpt_repl,x))
+        df = df.withColumn("TweetText", rpt_udf("TweetText"))
 
         #Dropping duplicates
         df = df.dropDuplicates(["TweetText"])
