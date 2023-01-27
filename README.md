@@ -9,10 +9,11 @@ This project was carried out as part of an exam-project in the MoSEF Data Scienc
 
 - Webscraping of twitter with selenium
 - Cleaning and preprocessing with pyspark
+- Exploratory Data Analysis
 - Sentiment Analysis modeling
 - Streamlit application
 
-All these steps were carried to try to recreate the strategies from the Bloomberg's article [EMBEDDED VALUE IN BLOOMBERG NEWS & SOCIAL SENTIMENT DATA](https://developer.twitter.com/content/dam/developer-twitter/pdfs-and-files/Bloomberg-Twitter-Data-Research-Report.pdf)
+All these steps were carried to try to recreate the strategies from the Bloomberg's article ["Embedded value in Bloomberg News & Social Sentiment Data"](https://developer.twitter.com/content/dam/developer-twitter/pdfs-and-files/Bloomberg-Twitter-Data-Research-Report.pdf)
 
 ## Getting started 
 
@@ -34,17 +35,22 @@ python twitter_scrapper.py
 You can clean your webscrapped dataset with the following command : 
 
 ```
+python preprocessing.py
+```
+
+### 3. EDA
+You can see the script for the EDA in the script below : 
+```
 python A AJOUTER.py
 ```
 
-### 3. Sentiment Analysis
+### 4. Sentiment Analysis
 You can run the model with the following command : 
-
 ```
 python A AJOUTER.py
 ```
 
-### 4. Launching the streamlit application
+### 5. Launching the streamlit application
 You can run the model with the following command : 
 
 ```
