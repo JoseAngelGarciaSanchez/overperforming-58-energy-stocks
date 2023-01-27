@@ -65,7 +65,6 @@ class PreprocessorPipeline:
         df = df.withColumn("Handle", trim(regexp_replace("Handle", "@", "")))
         return df
 
-
     def filtering_english(self, df):
         df_pd = df.toPandas()
         def detect_en(text):  
@@ -79,15 +78,15 @@ class PreprocessorPipeline:
 
         return df
 
-    def creating_csv(self, df, output_path):
+    def creating_csv(self, df):
         print('Creating the cleaned csv!')
         df.write.format("csv").mode("overwrite").option("header", "true").save(self.output_path)
         return df
 
 
 if __name__ == "__main__":
-    path = "/Users/sarrabenyahia/Documents/GitHub/overperforming-58-energy-stocks/webscraped_WEYERHAEUSER_CO1.csv"
-    output_path = "/Users/sarrabenyahia/Documents/GitHub/overperforming-58-energy-stocks/processed_df.csv"
+    path = "./../data/webscraped_WEYERHAEUSER_CO1.csv"
+    output_path = "./../data/processed_df.csv"
     preprocessing = PreprocessorPipeline(path =path, output_path=output_path)
     df = preprocessing.import_df(path)
     df = preprocessing.cast_columns(df)
@@ -95,7 +94,7 @@ if __name__ == "__main__":
     df = preprocessing.dealing_with_na(df)
     df = preprocessing.loosing_handle(df)
     df = preprocessing.filtering_english(df)
-    preprocessing.creating_csv(df, output_path)
+    preprocessing.creating_csv(df)
     print("Here is the result :) ")
     df.show()
     #print(df.count())
