@@ -116,14 +116,13 @@ class PreprocessorPipeline:
 
         df.write.format("csv").mode("overwrite").option(
             "header", "true").save(self.output_path)
-
         return df
 
 
 if __name__ == "__main__":
 
     path = sys.argv[1]
-    output_path = "./overperforming-58-energy-stocks/data_cleaned"
+    output_path = "./../data_cleaned/" + path.split("/")[-1]
     preprocessing = PreprocessorPipeline(path=path, output_path=output_path)
     df = preprocessing.import_df(path)
     df = preprocessing.cast_columns(df)
