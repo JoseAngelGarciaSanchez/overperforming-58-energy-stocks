@@ -50,8 +50,8 @@ st.subheader("Methodology")
 st.write(
     """    
     Improving the performance of 58 energy stocks. 
-    To do this, we web scraping tweets for the 58 stocks by classifying each of them thanks to a NLP model that we have built. 
-    Then, in t+1 we buy or sell the stocks based on the analyzed tweets. 
+    To do this, we use webscrapping on tweets for the 58 stocks by classifying, then we classify in positif or negatif each of them thanks to a NLP model. 
+    Then, in t+1 towards the tweet date, we buy or sell the stocks based on the analyzed tweets. If tweets on october 2021 are mostly positives, then we decide to buy the company stock. 
     This could be completed by news on bloomberg or other media such as bolsamania.
     """
 )
