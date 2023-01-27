@@ -28,6 +28,7 @@ pip install -r requirements.txt
 You can run the webscrapping with the following command : 
 
 ```
+cd webscrapping/
 python twitter_scrapper.py
 ```
 
@@ -35,18 +36,22 @@ python twitter_scrapper.py
 You can clean your webscrapped dataset with the following command : 
 
 ```
+cd ..
+cd preprocessing/
 python preprocessing.py
 ```
 
 ### 3. EDA
 You can see the script for the EDA in the script below : 
 ```
-python A AJOUTER.py
+eda.ipynb
 ```
 
 ### 4. Sentiment Analysis
 You can run the model with the following command : 
 ```
+cd..
+cd model/
 python A AJOUTER.py
 ```
 
@@ -54,5 +59,7 @@ python A AJOUTER.py
 You can run the model with the following command : 
 
 ```
+cd ..
+cd app/
 streamlit run home.py
 ```
