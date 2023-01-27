@@ -342,7 +342,8 @@ class TwitterScrapper:
             try:
                 self._suspicious_activity(driver)
             except NoSuchElementException:
-                print("No popup for suspicious activity :)")
+                if self.verbose:
+                    print("No popup for suspicious activity :)")
 
             # On rentre le mot de passe
             self._password(driver)
@@ -351,7 +352,8 @@ class TwitterScrapper:
             try:
                 self._no_reinforcement(driver)
             except NoSuchElementException:
-                print("No popup for reinforcing security :) ")
+                if self.verbose:
+                    print("No popup for reinforcing security :) ")
 
             # Popup "Activate the notifications"
             try:
