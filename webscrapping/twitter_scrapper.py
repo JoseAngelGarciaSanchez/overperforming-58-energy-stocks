@@ -409,7 +409,7 @@ def launch():
             research=i,
             output_path=output_path,
             start_date="2017-10-31",
-            end_date="2022-09-30",
+            end_date="2022-09-19",
             mail="mosefdatascience@gmail.com",
             username="mosefdata",
             password="MosefDataScience@",
