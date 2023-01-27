@@ -81,12 +81,12 @@ class PreprocessorPipeline:
         # df = df.withColumn("TweetText", remove_non_word_udf("TweetText"))
 
         # Repeating words like hurrrryyyyyy
-        rpt_regex = re.compile(r"(.)\1{1,}", re.IGNORECASE)
-        def rpt_repl(match):
-            return match.group(1)+match.group(1)
+        # rpt_regex = re.compile(r"(.)\1{1,}", re.IGNORECASE)
+        # def rpt_repl(match):
+        #     return match.group(1)+match.group(1)
 
-        rpt_udf = udf(lambda x: re.sub(rpt_regex,rpt_repl,x))
-        df = df.withColumn("TweetText", rpt_udf("TweetText"))
+        # rpt_udf = udf(lambda x: re.sub(rpt_regex,rpt_repl,x))
+        # df = df.withColumn("TweetText", rpt_udf("TweetText"))
 
         #Dropping duplicates
         df = df.dropDuplicates(["TweetText"])
