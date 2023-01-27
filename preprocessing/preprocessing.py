@@ -112,9 +112,10 @@ class PreprocessorPipeline:
 
     def creating_csv(self, df):
         """ Creating and saving the cleaned csv"""
+        
         print('---Creating the cleaned csv!')
 
-        df.write.format("csv").mode("overwrite").option(
+        df.coalesce(1).write.format("csv").mode("overwrite").option(
             "header", "true").save(self.output_path)
         return df
 
