@@ -4,6 +4,7 @@ from pyspark.sql.types import *
 from langdetect import detect
 import nltk
 import sys
+from nltk.stem.porter import PorterStemmer
 
 nltk.download('punkt')
 nltk.download('perluniprops')
@@ -16,7 +17,6 @@ class PreprocessorPipeline:
         self.output_path = output_path
 
     
-
     def import_df(self, path):
         """ Importing the webscrapped df to preprocess...
         """
@@ -33,9 +33,6 @@ class PreprocessorPipeline:
 
         return df
 
-
-    # ajouter une fonction pour concatener les csv?
-    
     def cast_columns(self, df):
         """ This function casts good columns types : ints and dates
         """
@@ -51,9 +48,9 @@ class PreprocessorPipeline:
         """ In this function, we're cleaning the text of the tweets. We're trimming all the special characters, the links, 
             and keeping only the text part.
         """
-
         print('---Cleaning the tweets with regex...')
 
+        df=df.withColumn("TweetText", lower(col("TweetText")))
         df = df.withColumn("TweetText", trim(
             regexp_replace("TweetText", "[\n]+", " ")))
         df = df.withColumn("TweetText", trim(
@@ -68,6 +65,7 @@ class PreprocessorPipeline:
             "TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
         df = df.withColumn("TweetText", regexp_replace(
             "TweetText", "[^a-zA-Z\\s]", ""))
+        df = df.dropDuplicates(["TweetText"])
 
         return df
 
@@ -130,10 +128,11 @@ if __name__ == "__main__":
     preprocessing = PreprocessorPipeline(path=path, output_path=output_path)
     df = preprocessing.import_df(path)
     df = preprocessing.cast_columns(df)
+    df = preprocessing.filtering_english(df)
     df = preprocessing.cleaning_tweets(df)
     df = preprocessing.dealing_with_na(df)
     df = preprocessing.loosing_handle(df)
-    df = preprocessing.filtering_english(df)
+
     preprocessing.creating_csv(df)
 
     print("Here is the result :) ")
