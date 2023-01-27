@@ -58,20 +58,22 @@ class PreprocessorPipeline:
 
         #Deleting special characters
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[\n]+", " "))) 
-        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
-        df = df.withColumn("TweetText", regexp_replace("TweetText", "[^a-zA-Z\\s]", ""))
 
         #URLs
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "https?://[^ ]+", "")))
+
+        
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
+
+
  
         #Deleting hashtags and mentions
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "#[^ ]+", "")))
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "@[^ ]+", "")))
 
         #Keeping only the text part of the tweets
-        df = df.withColumn("TweetText", regexp_extract(
-            "TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
-
+        df = df.withColumn("TweetText", regexp_extract("TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
+        
         # Spliting by word boundaries
         # def remove_non_word(text):
         #     pattern = re.compile(r"\W+")
@@ -153,11 +155,17 @@ if __name__ == "__main__":
     output_path = "./../data_cleaned/" + path.split("/")[-1]
     preprocessing = PreprocessorPipeline(path=path, output_path=output_path)
     df = preprocessing.import_df(path)
+    df.show()
     df = preprocessing.cast_columns(df)
+    df.show()
     df = preprocessing.cleaning_tweets(df)
-    df = preprocessing.dealing_with_na(df)
+    df.show()
     df = preprocessing.loosing_handle(df)
+    df.show()
     df = preprocessing.filtering_english(df)
+    df.show()
+    df = preprocessing.dealing_with_na(df)
+    df.show()
     preprocessing.creating_csv(df)
 
     print("Here is the result :) ")
