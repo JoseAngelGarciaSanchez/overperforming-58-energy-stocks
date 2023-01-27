@@ -70,7 +70,7 @@ class PreprocessorPipeline:
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
 
         #Keeping only the text part of the tweets
-        df = df.withColumn("TweetText", regexp_extract("TweetText", "(2017|2018|2019|2020|2021|2022).*", 0))
+        df = df.withColumn("TweetText", regexp_extract("TweetText", "(?<=2017|2018|2019|2020|2021|2022)(.*)", 0))
         
         # Spliting by word boundaries
         # def remove_non_word(text):
