@@ -54,11 +54,10 @@ class Model:
 
         return df
 
-
 if __name__ == "__main__":
 
     dataframe_path = sys.argv[1]
-    output_path = '.././model/model_df'  # je suis pas sûr de ced path
+    output_path = './model_df/model.csv'  
     model = Model()
     df = model.predict(dataframe_path, output_path)
     print("Here is the result :) ")
