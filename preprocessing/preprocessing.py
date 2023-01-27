@@ -15,7 +15,7 @@ class PreprocessorPipeline:
         self.path = path
         self.output_path = output_path
 
-    # ajouter une fonction pour concatener les csv?
+    
 
     def import_df(self, path):
         """ Importing the webscrapped df to preprocess...
@@ -33,6 +33,9 @@ class PreprocessorPipeline:
 
         return df
 
+
+    # ajouter une fonction pour concatener les csv?
+    
     def cast_columns(self, df):
         """ This function casts good columns types : ints and dates
         """
@@ -112,7 +115,7 @@ class PreprocessorPipeline:
 
     def creating_csv(self, df):
         """ Creating and saving the cleaned csv"""
-        
+
         print('---Creating the cleaned csv!')
 
         df.coalesce(1).write.format("csv").mode("overwrite").option(
