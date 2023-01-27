@@ -9,6 +9,7 @@ This project was carried out as part of an exam-project in the MoSEF Data Scienc
 
 - Webscraping of twitter with selenium
 - Cleaning and preprocessing with pyspark
+- Exploratory Data Analysis
 - Sentiment Analysis modeling
 - Streamlit application
 
