@@ -3,7 +3,7 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from langdetect import detect
 import nltk
-import sys 
+import sys
 
 nltk.download('punkt')
 nltk.download('perluniprops')
@@ -15,8 +15,7 @@ class PreprocessorPipeline:
         self.path = path
         self.output_path = output_path
 
-
-    #ajouter une fonction pour concatener les csv?
+    # ajouter une fonction pour concatener les csv?
 
     def import_df(self, path):
         """ Importing the webscrapped df to preprocess...
@@ -51,7 +50,7 @@ class PreprocessorPipeline:
         """
 
         print('---Cleaning the tweets with regex...')
-        
+
         df = df.withColumn("TweetText", trim(
             regexp_replace("TweetText", "[\n]+", " ")))
         df = df.withColumn("TweetText", trim(
@@ -105,6 +104,7 @@ class PreprocessorPipeline:
             except:
                 return False
         df_pd = df_pd[df_pd['TweetText'].apply(detect_en)]
+
         spark = SparkSession.builder.appName("CSVtoTable").getOrCreate()
         df = spark.createDataFrame(df_pd)
 
@@ -123,7 +123,7 @@ class PreprocessorPipeline:
 if __name__ == "__main__":
 
     path = sys.argv[1]
-    output_path = "./overperforming-58-energy-stocks/Data"
+    output_path = "./overperforming-58-energy-stocks/data_cleaned"
     preprocessing = PreprocessorPipeline(path=path, output_path=output_path)
     df = preprocessing.import_df(path)
     df = preprocessing.cast_columns(df)
