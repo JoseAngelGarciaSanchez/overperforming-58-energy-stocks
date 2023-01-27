@@ -56,31 +56,29 @@ class PreprocessorPipeline:
         #Lowering all characters
         df= df.withColumn("TweetText", lower(col("TweetText")))
 
-        #Deleting special characters
+        #Deleting special characters (\n)
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[\n]+", " "))) 
 
-        #URLs
+        #Deleting URLs
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "https?://[^ ]+", "")))
 
-        
+        #Deleting any character that is not an uppercase or lowercase letter, a digit, or a space
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
 
-
- 
         #Deleting hashtags and mentions
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "#[^ ]+", "")))
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "@[^ ]+", "")))
 
         #Keeping only the text part of the tweets
-        df = df.withColumn("TweetText", regexp_extract("TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
+        df = df.withColumn("TweetText", regexp_extract("TweetText", "(2017|2018|2019|2020|2021|2022).*", 0))
         
         # Spliting by word boundaries
-        # def remove_non_word(text):
-        #     pattern = re.compile(r"\W+")
-        #     return pattern.sub(" ", text)
+        def remove_non_word(text):
+            pattern = re.compile(r"\W+")
+            return pattern.sub(" ", text)
 
-        # remove_non_word_udf = udf(remove_non_word)
-        # df = df.withColumn("TweetText", remove_non_word_udf("TweetText"))
+        remove_non_word_udf = udf(remove_non_word)
+        df = df.withColumn("TweetText", remove_non_word_udf("TweetText"))
 
         # Repeating words like hurrrryyyyyy
         # rpt_regex = re.compile(r"(.)\1{1,}", re.IGNORECASE)
