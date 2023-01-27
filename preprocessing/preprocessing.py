@@ -70,15 +70,15 @@ class PreprocessorPipeline:
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "@[^ ]+", "")))
 
         #Keeping only the text part of the tweets
-        df = df.withColumn("TweetText", regexp_extract("TweetText", "(2017|2018|2019|2020|2021|2022).*", 0))
-        
+        df = df.withColumn("TweetText", regexp_extract("TweetText", "(2021|2017|2018|2019|2020|2022).*", 0))
+        df = df.withColumn("TweetText", regexp_extract("TweetText", "^(2017|2021|2018|2019|2020|2022)", 0))     
         # Spliting by word boundaries
-        def remove_non_word(text):
-            pattern = re.compile(r"\W+")
-            return pattern.sub(" ", text)
+        # def remove_non_word(text):
+        #     pattern = re.compile(r"\W+")
+        #     return pattern.sub(" ", text)
 
-        remove_non_word_udf = udf(remove_non_word)
-        df = df.withColumn("TweetText", remove_non_word_udf("TweetText"))
+        # remove_non_word_udf = udf(remove_non_word)
+        # df = df.withColumn("TweetText", remove_non_word_udf("TweetText"))
 
         # Repeating words like hurrrryyyyyy
         # rpt_regex = re.compile(r"(.)\1{1,}", re.IGNORECASE)
