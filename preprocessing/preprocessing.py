@@ -52,21 +52,21 @@ class PreprocessorPipeline:
             and keeping only the text part.
         """
         print('---Cleaning the tweets with regex...')
-
+   
         #Lowering all characters
         df= df.withColumn("TweetText", lower(col("TweetText")))
 
         #Deleting special characters
-        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[\n]+", " ")))
-        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "@[^ ]+", "")))
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[\n]+", " "))) 
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "[^A-Za-z0-9 ]", "")))
         df = df.withColumn("TweetText", regexp_replace("TweetText", "[^a-zA-Z\\s]", ""))
 
         #URLs
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "https?://[^ ]+", "")))
  
-        #Deleting hashtags
+        #Deleting hashtags and mentions
         df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "#[^ ]+", "")))
+        df = df.withColumn("TweetText", trim(regexp_replace("TweetText", "@[^ ]+", "")))
 
         #Keeping only the text part of the tweets
         df = df.withColumn("TweetText", regexp_extract(
