@@ -7,7 +7,7 @@ import plotly.subplots as sp
 
 # Layout
 st.set_page_config(page_title="Stock Analysis", page_icon=":bar_chart:", layout="wide")
-st.title("💸 Stock Analysis based on returns")
+st.title("Stock Analysis based on returns 💸")
 
 # Global Variables
 DATE_COLUMN = "DATE"
