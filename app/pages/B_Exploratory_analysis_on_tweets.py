@@ -96,6 +96,9 @@ condition2 = tweets['PostDate'] <= end_date
 mask = condition1 & condition2
 filtered_tweets = tweets.loc[mask, :]
 
+# Initialiser la variable des mots vides
+stop_words = set(stopwords.words('english'))
+
 if len(options) == 0:
     st.warning('Please select at least one stock to see the metrics.')
 
@@ -108,8 +111,6 @@ elif len(options) == 1:
     #     st.metric(label='**Total Returns**', value=str(returns[options].map('{:,.0f}'.format).values[0]))
     #     st.metric(label='**Average Transactions/Block**', value=str(returns[options].map('{:,.0f}'.format).values[0]))
 
-    # Initialiser la variable des mots vides
-    stop_words = set(stopwords.words('english'))
     # we select all the tweets from 2017 to 2022
     tweet_list = filtered_tweets["TweetText"].tolist()
     # join all tweets into a single string
@@ -141,5 +142,90 @@ elif len(options) == 1:
         st.pyplot(plt)
     frequency_tweets_length_stock()
 
-else:
-    1
+elif len(options) == 2:
+    st.subheader(f'Analytics for {", ".join(options)} from {start_date} to {end_date}')
+    c1, c2 = st.columns(2)
+
+    with c1:
+        mask_1 = filtered_tweets['company']==options[0] 
+        filtered_tweets_1 = filtered_tweets.loc[mask_1,:]
+        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_1.shape[0]))
+
+        # frequency plot
+        def frequency_tweets_length_stock():
+            sns.set_style("darkgrid")
+            sns.displot(filtered_tweets_1['tweet_length'], bins=20 )
+            plt.title(f"Tweet frequency length for {options[0]}")
+            plt.xlabel('Tweet Length')
+            plt.ylabel('Number of Tweets')
+            plt.show()
+            st.pyplot(plt)
+        frequency_tweets_length_stock()
+    
+    with c2:
+        mask_2 = filtered_tweets['company']==options[1]
+        filtered_tweets_2 = filtered_tweets.loc[mask_2,:]
+        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_2.shape[0]))
+
+        # frequency plot
+        def frequency_tweets_length_stock():
+            sns.set_style("darkgrid")
+            sns.displot(filtered_tweets_2['tweet_length'], bins=20 )
+            plt.title(f"Tweet frequency length for {options[1]}")
+            plt.xlabel('Tweet Length')
+            plt.ylabel('Number of Tweets')
+            plt.show()
+            st.pyplot(plt)
+        frequency_tweets_length_stock()
+
+elif len(options) == 3:
+    st.subheader(f'Analytics for {", ".join(options)} from {start_date} to {end_date}')
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        mask_1 = filtered_tweets['company']==options[0] 
+        filtered_tweets_1 = filtered_tweets.loc[mask_1,:]
+        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_1.shape[0]))
+
+        # frequency plot
+        def frequency_tweets_length_stock():
+            sns.set_style("darkgrid")
+            sns.displot(filtered_tweets_1['tweet_length'], bins=20 )
+            plt.title(f"Tweet frequency length for {options[0]}")
+            plt.xlabel('Tweet Length')
+            plt.ylabel('Number of Tweets')
+            plt.show()
+            st.pyplot(plt)
+        frequency_tweets_length_stock()
+    
+    with c2:
+        mask_2 = filtered_tweets['company']==options[1]
+        filtered_tweets_2 = filtered_tweets.loc[mask_2,:]
+        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_2.shape[0]))
+
+        # frequency plot
+        def frequency_tweets_length_stock():
+            sns.set_style("darkgrid")
+            sns.displot(filtered_tweets_2['tweet_length'], bins=20 )
+            plt.title(f"Tweet frequency length for {options[1]}")
+            plt.xlabel('Tweet Length')
+            plt.ylabel('Number of Tweets')
+            plt.show()
+            st.pyplot(plt)
+        frequency_tweets_length_stock()
+
+    with c3:
+        mask_3 = filtered_tweets['company']==options[2]
+        filtered_tweets_3 = filtered_tweets.loc[mask_3,:]
+        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_3.shape[0]))
+
+        # frequency plot
+        def frequency_tweets_length_stock():
+            sns.set_style("darkgrid")
+            sns.displot(filtered_tweets_3['tweet_length'], bins=20 )
+            plt.title(f"Tweet frequency length for {options[2]}")
+            plt.xlabel('Tweet Length')
+            plt.ylabel('Number of Tweets')
+            plt.show()
+            st.pyplot(plt)
+        frequency_tweets_length_stock()
