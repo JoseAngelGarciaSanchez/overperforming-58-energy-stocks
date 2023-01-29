@@ -112,8 +112,7 @@ elif len(options) == 1:
     mask = filtered_tweets['company']==options[0] 
     filtered_tweets = filtered_tweets.loc[mask,:]
     st.subheader(f'Analytics for {options[0]} from {start_date} to {end_date}')
-    c1, c2, c3, c4, c5 = st.columns(5)
-    c2.metric(label=f"Number of tweets:", value=str(filtered_tweets.shape[0]))
+    st.metric(label=f"Number of tweets for {options[0]}:", value=str(filtered_tweets.shape[0]))
     #     st.metric(label='**Total Returns**', value=str(returns[options].map('{:,.0f}'.format).values[0]))
     #     st.metric(label='**Average Transactions/Block**', value=str(returns[options].map('{:,.0f}'.format).values[0]))
 
@@ -129,11 +128,11 @@ elif len(options) == 1:
     wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
+    plt.title(f"Wordcloud for {options[0]} from {start_date} to {end_date}")
     plt.axis('off')
     plt.show()
     
     def wordcloud_stock():
-        st.title(f"Wordcloud for {options[0]} that represents the most used words for tweets")
         st.pyplot(plt)
     wordcloud_stock()
 
@@ -155,8 +154,7 @@ elif len(options) == 2:
     with c1:
         mask_1 = filtered_tweets['company']==options[0] 
         filtered_tweets_1 = filtered_tweets.loc[mask_1,:]
-        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_1.shape[0]))
-
+        st.metric(label=f"Number of tweets for {options[0]}:", value=str(filtered_tweets_1.shape[0]))
 
         # we select all the tweets from 2017 to 2022
         tweet_list = filtered_tweets_1["TweetText"].tolist()
@@ -189,7 +187,7 @@ elif len(options) == 2:
     with c2:
         mask_2 = filtered_tweets['company']==options[1]
         filtered_tweets_2 = filtered_tweets.loc[mask_2,:]
-        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_2.shape[0]))
+        st.metric(label=f"Number of tweets for {options[1]}:", value=str(filtered_tweets_2.shape[0]))
 
         # we select all the tweets from 2017 to 2022
         tweet_list = filtered_tweets_2["TweetText"].tolist()
@@ -226,7 +224,7 @@ elif len(options) == 3:
     with c1:
         mask_1 = filtered_tweets['company']==options[0] 
         filtered_tweets_1 = filtered_tweets.loc[mask_1,:]
-        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_1.shape[0]))
+        st.metric(label=f"Number of tweets for {options[0]}:", value=str(filtered_tweets_1.shape[0]))
 
         # we select all the tweets from 2017 to 2022
         tweet_list = filtered_tweets_1["TweetText"].tolist()
@@ -260,7 +258,7 @@ elif len(options) == 3:
     with c2:
         mask_2 = filtered_tweets['company']==options[1]
         filtered_tweets_2 = filtered_tweets.loc[mask_2,:]
-        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_2.shape[0]))
+        st.metric(label=f"Number of tweets for {options[1]}:", value=str(filtered_tweets_2.shape[0]))
 
         # we select all the tweets from 2017 to 2022
         tweet_list = filtered_tweets_2["TweetText"].tolist()
@@ -294,7 +292,7 @@ elif len(options) == 3:
     with c3:
         mask_3 = filtered_tweets['company']==options[2]
         filtered_tweets_3 = filtered_tweets.loc[mask_3,:]
-        st.metric(label=f"Number of tweets:", value=str(filtered_tweets_3.shape[0]))
+        st.metric(label=f"Number of tweets for {options[2]}:", value=str(filtered_tweets_3.shape[0]))
 
         # we select all the tweets from 2017 to 2022
         tweet_list = filtered_tweets_3["TweetText"].tolist()
