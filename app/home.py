@@ -85,10 +85,20 @@ st.dataframe(tweets.head())
 st.subheader("Methodology")
 st.write(
     """    
-    Improving the performance of 58 energy stocks. 
-    To do this, we use webscrapping on tweets for the 58 stocks by classifying, then we classify in positif or negatif each of them thanks to a NLP model. 
-    Then, in t+1 towards the tweet date, we buy or sell the stocks based on the analyzed tweets. If tweets on october 2021 are mostly positives, then we decide to buy the company stock. 
-    This could be completed by news on bloomberg or other media such as bolsamania.
+    The webscrapped dataset is then preprocessed and cleaned by a script in the folder. We're then doing an exploratory analysis and finally implementing a sentiment analysis model.
+    We're implementing two pre-trained models to our webscrapped and preprocessed dataframe : 
+
+    The first one is "tarnformnet/Stock-Sentiment-BERT" model, which is a BERT-based model trained on stock market-related 
+    tweets for sentiment analysis. The model is fine-tuned on a dataset of tweets related to publicly traded companies and is 
+    able to predict the sentiment of tweets as either positive, negative, or neutral.
+
+    The second one is  a pre-trained language model called "finBERT" that was developed by Prosus AI and made available through 
+    the Hugging Face library. It is a BERT model fine-tuned on financial domain-specific data, trained to do tasks such as 
+    sentiment analysis, named entity recognition, and question answering. The model is trained on a large dataset of financial 
+    articles, news and SEC filings. The finBERT can be fine-tuned on specific financial tasks, and it can be used for a variety 
+    of NLP tasks including sentiment analysis, named entity recognition, and question answering. 
+
+    This aggregated model has for goal to guide us for decision in stocks, like bear or bull. 
     """
 )
 
