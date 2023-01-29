@@ -57,7 +57,7 @@ class Model:
 if __name__ == "__main__":
 
     dataframe_path = sys.argv[1]
-    output_path = './model_df/model.csv'  
+    output_path = "./../data_cleaned/" + path.split("/")[-1]
     model = Model()
     df = model.predict(dataframe_path, output_path)
     print("Here is the result :) ")
