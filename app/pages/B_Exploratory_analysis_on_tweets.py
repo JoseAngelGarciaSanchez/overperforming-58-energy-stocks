@@ -12,7 +12,7 @@ DATA_PATH = "./../data/stocks_data.xlsx"
 TWEETS_PATH = [
     "./../data_cleaned/webscraped_FMC_CORP.csv/part-00000-9fe4bf5d-f913-4d0c-a98a-8f1d088639ee-c000.csv",
     "./../data_cleaned/webscraped_WEYERHAEUSER_CO.csv/part-00000-17a4305d-9672-4ddf-87fc-d180dcf01612-c000.csv",
-    "./../data_cleaned/webscraped_BP_PLC.csv/part-00000-8a74ec7d-2015-42d8-8960-ce8e11e5a3a2-c000.csv",
+    "./../data_cleaned/webscraped_BP_PLC.csv/part-00000-60047cdf-7f10-49f8-932e-065bb69f747c-c000.csv",
 ]
 
 # Layout
