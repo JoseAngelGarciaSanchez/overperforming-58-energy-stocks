@@ -8,6 +8,7 @@ from PIL import Image
 # Global Variables
 DATE_COLUMN = "DATE"
 DATA_PATH = "./../data/stocks_data.xlsx"
+RAW_TWEETS_PATH = ["./../data/webscraped_FMC_CORP.csv", "./../data/webscraped_WEYERHAEUSER_CO.csv", "./../data/webscraped_BP_PLC.csv"]
 
 # Layout
 st.set_page_config(page_title="Home", page_icon=":bar_chart:", layout="wide")
@@ -69,9 +70,9 @@ def load_data():
     returns.rename(columns={"level_0": "DATE1", "level_1": "DATE"}, inplace=True)
     returns.drop(columns="DATE1", inplace=True)
     returns[DATE_COLUMN] = pd.to_datetime(returns[DATE_COLUMN]).dt.date
-    fmc_tweets = pd.read_csv(TWEETS_PATH[0])
+    fmc_tweets = pd.read_csv(RAW_TWEETS_PATH[0])
     fmc_tweets['company'] = "FMC CORP"
-    wy_tweets = pd.read_csv(TWEETS_PATH[1])
+    wy_tweets = pd.read_csv(RAW_TWEETS_PATH[1])
     wy_tweets['company'] = "WEYERHAEUSER CO"   
     tweets = pd.concat([fmc_tweets, wy_tweets])
     tweets["PostDate"] = pd.to_datetime(tweets["PostDate"]).dt.date
