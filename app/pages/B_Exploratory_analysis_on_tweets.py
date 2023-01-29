@@ -34,10 +34,13 @@ def load_data():
     returns.rename(columns={"level_0": "DATE1", "level_1": "DATE"}, inplace=True)
     returns.drop(columns="DATE1", inplace=True)
     returns[DATE_COLUMN] = pd.to_datetime(returns[DATE_COLUMN]).dt.date
+    # we add fmc webscrapped data
     fmc_tweets = pd.read_csv(TWEETS_PATH[0])
     fmc_tweets['company'] = "FMC CORP"
+    # we add wy webscrapped data
     wy_tweets = pd.read_csv(TWEETS_PATH[1])
     wy_tweets['company'] = "WEYERHAEUSER CO"
+    # we add bp webscrapped data
     bp_tweets = pd.read_csv(TWEETS_PATH[2])
     bp_tweets['company'] = "BP PLC"
     tweets = pd.concat([fmc_tweets, wy_tweets, bp_tweets])
