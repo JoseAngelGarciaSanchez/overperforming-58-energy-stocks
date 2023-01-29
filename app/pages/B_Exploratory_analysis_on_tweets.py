@@ -37,8 +37,10 @@ def load_data():
     fmc_tweets = pd.read_csv(TWEETS_PATH[0])
     fmc_tweets['company'] = "FMC CORP"
     wy_tweets = pd.read_csv(TWEETS_PATH[1])
-    wy_tweets['company'] = "WEYERHAEUSER CO"   
-    tweets = pd.concat([fmc_tweets, wy_tweets])
+    wy_tweets['company'] = "WEYERHAEUSER CO"
+    bp_tweets = pd.read_csv(TWEETS_PATH[2])
+    bp_tweets['company'] = "BP PLC"
+    tweets = pd.concat([fmc_tweets, wy_tweets, bp_tweets])
     tweets["PostDate"] = pd.to_datetime(tweets["PostDate"]).dt.date
     # we add a column with the length of each tweet
     tweets['tweet_length'] = tweets['TweetText'].apply(lambda x : len(x.split()))
