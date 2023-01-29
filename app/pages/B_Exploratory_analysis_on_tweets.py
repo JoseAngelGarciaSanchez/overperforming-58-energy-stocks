@@ -134,8 +134,8 @@ elif len(options) == 1:
     # frequency plot
     def frequency_tweets_length_stock():
         sns.set_style("darkgrid")
-        st.title(f"Frequency for {options[0]} that represents the most used length for tweets")
         sns.displot(filtered_tweets['tweet_length'], bins=20 )
+        plt.title(f"Tweet frequency length for {options[0]}")
         plt.xlabel('Tweet Length')
         plt.ylabel('Number of Tweets')
         plt.show()
@@ -151,6 +151,12 @@ elif len(options) == 2:
         filtered_tweets_1 = filtered_tweets.loc[mask_1,:]
         st.metric(label=f"Number of tweets:", value=str(filtered_tweets_1.shape[0]))
 
+
+        # we select all the tweets from 2017 to 2022
+        tweet_list = filtered_tweets_1["TweetText"].tolist()
+        # join all tweets into a single string
+        tweet_string = ' '.join(tweet_list)
+        
         # frequency plot
         def frequency_tweets_length_stock():
             sns.set_style("darkgrid")
@@ -161,11 +167,28 @@ elif len(options) == 2:
             plt.show()
             st.pyplot(plt)
         frequency_tweets_length_stock()
+
+        # create the word cloud
+        wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
+        plt.figure(figsize=(10, 5))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(f"Wordcloud for {options[0]} from {start_date} to {end_date}")
+        plt.axis('off')
+        plt.show()
+        
+        def wordcloud_stock():
+            st.pyplot(plt)
+        wordcloud_stock()
     
     with c2:
         mask_2 = filtered_tweets['company']==options[1]
         filtered_tweets_2 = filtered_tweets.loc[mask_2,:]
         st.metric(label=f"Number of tweets:", value=str(filtered_tweets_2.shape[0]))
+
+        # we select all the tweets from 2017 to 2022
+        tweet_list = filtered_tweets_2["TweetText"].tolist()
+        # join all tweets into a single string
+        tweet_string = ' '.join(tweet_list)
 
         # frequency plot
         def frequency_tweets_length_stock():
@@ -177,6 +200,18 @@ elif len(options) == 2:
             plt.show()
             st.pyplot(plt)
         frequency_tweets_length_stock()
+
+        # create the word cloud
+        wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
+        plt.figure(figsize=(10, 5))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(f"Wordcloud for {options[0]} from {start_date} to {end_date}")
+        plt.axis('off')
+        plt.show()
+        
+        def wordcloud_stock():
+            st.pyplot(plt)
+        wordcloud_stock()
 
 elif len(options) == 3:
     st.subheader(f'Analytics for {", ".join(options)} from {start_date} to {end_date}')
@@ -187,6 +222,11 @@ elif len(options) == 3:
         filtered_tweets_1 = filtered_tweets.loc[mask_1,:]
         st.metric(label=f"Number of tweets:", value=str(filtered_tweets_1.shape[0]))
 
+        # we select all the tweets from 2017 to 2022
+        tweet_list = filtered_tweets_1["TweetText"].tolist()
+        # join all tweets into a single string
+        tweet_string = ' '.join(tweet_list)
+
         # frequency plot
         def frequency_tweets_length_stock():
             sns.set_style("darkgrid")
@@ -197,11 +237,29 @@ elif len(options) == 3:
             plt.show()
             st.pyplot(plt)
         frequency_tweets_length_stock()
+
+        # create the word cloud
+        wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
+        plt.figure(figsize=(10, 5))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(f"Wordcloud for {options[0]} from {start_date} to {end_date}")
+        plt.axis('off')
+        plt.show()
+        
+        def wordcloud_stock():
+            st.pyplot(plt)
+        wordcloud_stock()
+
     
     with c2:
         mask_2 = filtered_tweets['company']==options[1]
         filtered_tweets_2 = filtered_tweets.loc[mask_2,:]
         st.metric(label=f"Number of tweets:", value=str(filtered_tweets_2.shape[0]))
+
+        # we select all the tweets from 2017 to 2022
+        tweet_list = filtered_tweets_2["TweetText"].tolist()
+        # join all tweets into a single string
+        tweet_string = ' '.join(tweet_list)
 
         # frequency plot
         def frequency_tweets_length_stock():
@@ -214,10 +272,28 @@ elif len(options) == 3:
             st.pyplot(plt)
         frequency_tweets_length_stock()
 
+        # create the word cloud
+        wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
+        plt.figure(figsize=(10, 5))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(f"Wordcloud for {options[1]} from {start_date} to {end_date}")
+        plt.axis('off')
+        plt.show()
+        
+        def wordcloud_stock():
+            st.pyplot(plt)
+        wordcloud_stock()
+
+
     with c3:
         mask_3 = filtered_tweets['company']==options[2]
         filtered_tweets_3 = filtered_tweets.loc[mask_3,:]
         st.metric(label=f"Number of tweets:", value=str(filtered_tweets_3.shape[0]))
+
+        # we select all the tweets from 2017 to 2022
+        tweet_list = filtered_tweets_3["TweetText"].tolist()
+        # join all tweets into a single string
+        tweet_string = ' '.join(tweet_list)
 
         # frequency plot
         def frequency_tweets_length_stock():
@@ -229,3 +305,16 @@ elif len(options) == 3:
             plt.show()
             st.pyplot(plt)
         frequency_tweets_length_stock()
+
+        # create the word cloud
+        wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
+        plt.figure(figsize=(10, 5))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(f"Wordcloud for {options[2]} from {start_date} to {end_date}")
+        plt.axis('off')
+        plt.show()
+        
+        def wordcloud_stock():
+            st.pyplot(plt)
+        wordcloud_stock()
+
