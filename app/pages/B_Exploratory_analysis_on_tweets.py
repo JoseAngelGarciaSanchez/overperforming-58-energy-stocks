@@ -55,8 +55,9 @@ def load_data():
     tweets["PostDate"] = pd.to_datetime(tweets["PostDate"]).dt.date
     # we add a column with the length of each tweet
     tweets["tweet_length"] = tweets["TweetText"].apply(lambda x: len(x.split()))
-    tweets["avg_word_length"] = tweets['TweetText'].apply(
-        lambda x: sum(len(word) for word in x.split()) / len(x.split()))
+    tweets["avg_word_length"] = tweets["TweetText"].apply(
+        lambda x: sum(len(word) for word in x.split()) / len(x.split())
+    )
     return returns, tweets
 
 
@@ -119,21 +120,25 @@ stop_words = set(stopwords.words("english"))
 def starts_with_number(word):
     return word[0].isdigit()
 
+
 def most_common_words_tweets(filter_tw, number):
     # Create a list of all the words in the column 'TweetText'
-    all_words = ' '.join(filter_tw['TweetText'])
+    all_words = " ".join(filter_tw["TweetText"])
 
     # Split the list into individual words
     words = all_words.split()
-    words = [word for word in words if (
-        word.lower() not in stop_words) and (not starts_with_number(word))]
+    words = [
+        word
+        for word in words
+        if (word.lower() not in stop_words) and (not starts_with_number(word))
+    ]
 
     # Use the pandas method 'value_counts' to get the frequency of each word
     word_freq = pd.Series(words).value_counts()
     # Plot the top 20 most common words
     word_freq[:20].sort_values(ascending=True).plot.barh()
 
-    fig = px.bar(word_freq.reset_index(), x='index', y=0, text=0)
+    fig = px.bar(word_freq.reset_index(), x="index", y=0, text=0)
     fig.update_layout(
         title=f"Most Common Words in the Tweets for {options[number]}",
         xaxis_title="Words",
@@ -141,42 +146,53 @@ def most_common_words_tweets(filter_tw, number):
     )
     st.plotly_chart(fig)
 
+
 def length_of_words(filter_tw, number):
-        fig = px.histogram(filter_tw, x="avg_word_length", nbins=20)
-        fig.update_layout(
-            xaxis_title="Average Word Length",
-            yaxis_title="Frequency",
-            title=f"Distribution of Average Word Length in Tweets for {options[number]} from {start_date} to {end_date}"
-        )
-        st.plotly_chart(fig)
+    fig = px.histogram(filter_tw, x="avg_word_length", nbins=20)
+    fig.update_layout(
+        xaxis_title="Average Word Length",
+        yaxis_title="Frequency",
+        title=f"Distribution of Average Word Length in Tweets for {options[number]} from {start_date} to {end_date}",
+    )
+    st.plotly_chart(fig)
+
 
 def treemap(filter_tw, number):
-    tweet_text = filter_tw['TweetText'].str.cat(sep=' ')
+    tweet_text = filter_tw["TweetText"].str.cat(sep=" ")
 
     # split the words and remove stopwords
-    filtered_words = [word for word in tweet_text.split() if (
-        word.lower() not in stop_words) and (not starts_with_number(word))]
+    filtered_words = [
+        word
+        for word in tweet_text.split()
+        if (word.lower() not in stop_words) and (not starts_with_number(word))
+    ]
 
     # get the top 20 most common words
     common_words = Counter(filtered_words).most_common(20)
     # Create a DataFrame from the list of common words
-    df = pd.DataFrame(common_words, columns=['word', 'count'])
+    df = pd.DataFrame(common_words, columns=["word", "count"])
 
     # create the treemap
-    fig = px.treemap(df, 
-                     path=['word'], 
-                     values='count', 
-                     title=f'Treemap of most common words for {options[number]}',
-                     color='count',
-                     color_continuous_scale='reds')
+    fig = px.treemap(
+        df,
+        path=["word"],
+        values="count",
+        title=f"Treemap of most common words for {options[number]}",
+        color="count",
+        color_continuous_scale="reds",
+    )
     st.plotly_chart(fig)
 
+
 def word_donut_plot(df, number):
-    all_words = ' '.join(df['TweetText']).split()
+    all_words = " ".join(df["TweetText"]).split()
 
     # Filter out the stop words and words starting with numbers
-    all_words = [word for word in all_words if (
-        word.lower() not in stop_words) and (not starts_with_number(word))]
+    all_words = [
+        word
+        for word in all_words
+        if (word.lower() not in stop_words) and (not starts_with_number(word))
+    ]
 
     # Count the number of occurrences of each word
     word_counts = Counter(all_words)
@@ -185,8 +201,9 @@ def word_donut_plot(df, number):
     unique_words = dict(word_counts)
 
     # Sort the dictionary by values (word counts) in descending order
-    unique_words = dict(sorted(unique_words.items(),
-                        key=lambda item: item[1], reverse=True))
+    unique_words = dict(
+        sorted(unique_words.items(), key=lambda item: item[1], reverse=True)
+    )
 
     # Keep the first n items where n is the number of items you want to keep
     unique_words = dict(list(unique_words.items())[:number])
@@ -199,19 +216,30 @@ def word_donut_plot(df, number):
     wedges, texts = ax.pie(data, wedgeprops=dict(width=0.5), startangle=-40)
 
     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-    kw = dict(xycoords='data', textcoords='data', arrowprops=dict(arrowstyle="-"),
-              bbox=bbox_props, zorder=0, va="center")
+    kw = dict(
+        xycoords="data",
+        textcoords="data",
+        arrowprops=dict(arrowstyle="-"),
+        bbox=bbox_props,
+        zorder=0,
+        va="center",
+    )
 
     for i, p in enumerate(wedges):
-        ang = (p.theta2 - p.theta1)/2. + p.theta1
+        ang = (p.theta2 - p.theta1) / 2.0 + p.theta1
         y = np.sin(np.deg2rad(ang))
         x = np.cos(np.deg2rad(ang))
         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
         connectionstyle = "angle,angleA=0,angleB={}".format(ang)
         kw["arrowprops"].update({"connectionstyle": connectionstyle})
         kw["va"] = "center"
-        ax.annotate(list(unique_words.keys())[i], xy=(x, y), xytext=(1.7*np.sign(x), 1.7*y),
-                    horizontalalignment=horizontalalignment, **kw)
+        ax.annotate(
+            list(unique_words.keys())[i],
+            xy=(x, y),
+            xytext=(1.7 * np.sign(x), 1.7 * y),
+            horizontalalignment=horizontalalignment,
+            **kw,
+        )
 
     ax.set_title(f"Unique words in tweets for {options[number]}")
 
@@ -351,10 +379,10 @@ elif len(options) == 2:
         wordcloud_stock()
 
     length_of_words(filtered_tweets_1, 0)
-    length_of_words(filtered_tweets_2, 1) 
+    length_of_words(filtered_tweets_2, 1)
 
     most_common_words_tweets(filtered_tweets_1, 0)
-    most_common_words_tweets(filtered_tweets_2, 1) 
+    most_common_words_tweets(filtered_tweets_2, 1)
 
     treemap(filtered_tweets_1, 0)
     treemap(filtered_tweets_2, 1)
@@ -464,8 +492,6 @@ elif len(options) == 3:
 
         frequency_tweets_length_stock()
 
-        
-
         def wordcloud_stock():
             # create the word cloud
             wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
@@ -478,13 +504,12 @@ elif len(options) == 3:
 
         wordcloud_stock()
 
-
     length_of_words(filtered_tweets_1, 0)
-    length_of_words(filtered_tweets_2, 1) 
+    length_of_words(filtered_tweets_2, 1)
     length_of_words(filtered_tweets_3, 2)
 
     most_common_words_tweets(filtered_tweets_1, 0)
-    most_common_words_tweets(filtered_tweets_2, 1) 
+    most_common_words_tweets(filtered_tweets_2, 1)
     most_common_words_tweets(filtered_tweets_3, 2)
 
     treemap(filtered_tweets_1, 0)
