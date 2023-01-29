@@ -46,6 +46,17 @@ for i, stock in enumerate(stock_list):
     elif i == 6:
         c7.image(Image.open(logo_path))
 
+
+st.subheader("Presentation Twitter")
+st.write(
+    """    
+    Twitter is a social media platform that allows users to post short messages, called tweets, which can contain text, images, and videos. These tweets can be viewed by other users, who can also interact with them by replying, re-tweeting, or liking them.
+    From a web scraping point of view, Twitter can be accessed through its website, which is built using a combination of HTML, CSS, and JavaScript. To scrape data from Twitter, one would need to send HTTP requests to the Twitter server, which would return the HTML of the webpage. This HTML can then be parsed using a library such as Selenium to extract the desired data, such as tweets, 
+    user information, and follower counts.
+    It's important to note that scraping data from Twitter is against the company's terms of service, and it is not recommended to scrape the data without permission. Also, Twitter has some security mechanisms that prevent scraping like CAPTCHA, IP blocking and rate limiting
+    """
+)
+
 st.subheader("Methodology")
 st.write(
     """    
