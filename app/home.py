@@ -57,6 +57,9 @@ st.write(
     """
 )
 
+st.subheader("Example of webscrapped dataset")
+st.dataframe()
+
 st.subheader("Methodology")
 st.write(
     """    
