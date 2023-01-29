@@ -18,7 +18,7 @@ class PreprocessorPipeline:
         self.output_path = output_path
 
     
-    def import_df(self, path):
+    def import_df(self):
         """ Importing the webscrapped df to preprocess...
         """
 
@@ -145,6 +145,23 @@ class PreprocessorPipeline:
         df.coalesce(1).write.format("csv").mode("overwrite").option(
             "header", "true").save(self.output_path)
         return df
+    
+    def launch(self):
+        df = preprocessing.import_df()
+        df.show()
+        df = preprocessing.cast_columns(df)
+        df.show()
+        df = preprocessing.cleaning_tweets(df)
+        df.show()
+        df = preprocessing.loosing_handle(df)
+        df.show()
+        df = preprocessing.filtering_english(df)
+        df.show()
+        df = preprocessing.dealing_with_na(df)
+        df.show()
+        preprocessing.creating_csv(df)
+        print("Here is the result :) ")
+        df.show()
 
 
 if __name__ == "__main__":
@@ -152,19 +169,4 @@ if __name__ == "__main__":
     path = sys.argv[1]
     output_path = "./../data_cleaned/" + path.split("/")[-1]
     preprocessing = PreprocessorPipeline(path=path, output_path=output_path)
-    df = preprocessing.import_df(path)
-    df.show()
-    df = preprocessing.cast_columns(df)
-    df.show()
-    df = preprocessing.cleaning_tweets(df)
-    df.show()
-    df = preprocessing.loosing_handle(df)
-    df.show()
-    df = preprocessing.filtering_english(df)
-    df.show()
-    df = preprocessing.dealing_with_na(df)
-    df.show()
-    preprocessing.creating_csv(df)
-
-    print("Here is the result :) ")
-    df.show()
+    preprocessing.launch()
