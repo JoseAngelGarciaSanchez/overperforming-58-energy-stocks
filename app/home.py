@@ -58,7 +58,28 @@ st.write(
 )
 
 st.subheader("Example of webscrapped dataset")
-st.dataframe()
+@st.cache
+def load_data():
+    returns = pd.read_excel(DATA_PATH, sheet_name="Returns", header=[5, 6]).T.iloc[2:, :]
+    returns = returns.rename(columns=returns.iloc[0])
+    returns = returns.iloc[2:]
+    upercase = lambda x: str(x).upper()
+    returns.rename(upercase, axis="columns", inplace=True)
+    returns.reset_index(inplace=True)
+    returns.rename(columns={"level_0": "DATE1", "level_1": "DATE"}, inplace=True)
+    returns.drop(columns="DATE1", inplace=True)
+    returns[DATE_COLUMN] = pd.to_datetime(returns[DATE_COLUMN]).dt.date
+    fmc_tweets = pd.read_csv(TWEETS_PATH[0])
+    fmc_tweets['company'] = "FMC CORP"
+    wy_tweets = pd.read_csv(TWEETS_PATH[1])
+    wy_tweets['company'] = "WEYERHAEUSER CO"   
+    tweets = pd.concat([fmc_tweets, wy_tweets])
+    tweets["PostDate"] = pd.to_datetime(tweets["PostDate"]).dt.date
+    # we add a column with the length of each tweet
+    tweets['tweet_length'] = tweets['TweetText'].apply(lambda x : len(x.split()))
+    return returns, tweets
+returns, tweets = load_data()
+st.dataframe(tweets.head())
 
 st.subheader("Methodology")
 st.write(
