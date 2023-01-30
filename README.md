@@ -29,7 +29,7 @@ You can run the webscrapping with the following command :
 
 ```
 cd webscrapping/
-python twitter_scrapper.py
+python twitter_scrapper.py 
 ```
 
 ### 2. Cleaning and preprocessing of the dataset
@@ -38,7 +38,7 @@ You can clean your webscrapped dataset with the following command :
 ```
 cd ..
 cd preprocessing/
-python preprocessing.py
+python preprocessing.py <path_of_data_you_want_to_preprocess>
 ```
 
 ### 3. EDA
@@ -52,7 +52,7 @@ You can run the model with the following command :
 ```
 cd..
 cd model/
-python A AJOUTER.py
+python model.py <path_of_preprocessed_data>
 ```
 
 ### 5. Launching the streamlit application
