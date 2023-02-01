@@ -8,14 +8,14 @@ When rational arbitrageurs have limited risk-bearing capacity and time horizons,
 This project was carried out as part of an exam-project in the MoSEF Data Science Master of Paris 1 Panthéon Sorbonne. You can find different parts in this repository :
 
 - Webscraping of twitter with selenium
-- Cleaning and preprocessing with pyspark
+- Cleaning and preprocessing with Pyspark
 - Exploratory Data Analysis
 - Sentiment Analysis modeling
 - Streamlit application
 
-All these steps were carried to try to recreate the strategies from the Bloomberg's article ["Embedded value in Bloomberg News & Social Sentiment Data"](https://developer.twitter.com/content/dam/developer-twitter/pdfs-and-files/Bloomberg-Twitter-Data-Research-Report.pdf)
+All these steps were carried to try to recreate the strategies from the Bloomberg's article ["Embedded value in Bloomberg News & Social Sentiment Data"](https://developer.twitter.com/content/dam/developer-twitter/pdfs-and-files/Bloomberg-Twitter-Data-Research-Report.pdf).
 
-## Getting started 
+## Installation
 
 First, you'll have to clone the repository and activate your virtual environment.
 Then,  install the required packages with : 
@@ -24,7 +24,7 @@ Then,  install the required packages with :
 pip install -r requirements.txt
 ```
 
-### 1. Webscraping Twitter 
+### 1. Webscraping Twitter :bird:
 You can run the webscrapping with the following command : 
 
 ```
@@ -32,7 +32,7 @@ cd webscrapping/
 python twitter_scrapper.py 
 ```
 
-### 2. Cleaning and preprocessing of the dataset
+### 2. Cleaning and preprocessing of the dataset :potable_water:
 You can clean your webscrapped dataset with the following command : 
 
 ```
@@ -41,13 +41,13 @@ cd preprocessing/
 python preprocessing.py <path_of_data_you_want_to_preprocess>
 ```
 
-### 3. EDA
+### 3. Exploratory Data Analysis :bar_chart:
 You can see the script for the EDA in the script below : 
 ```
 eda.ipynb
 ```
 
-### 4. Sentiment Analysis
+### 4. Sentiment Analysis :two_men_holding_hands:
 You can run the model with the following command : 
 ```
 cd..
@@ -55,7 +55,7 @@ cd model/
 python model.py <path_of_preprocessed_data>
 ```
 
-### 5. Launching the streamlit application
+### 5. Launching the streamlit application :rocket:
 You can run the model with the following command : 
 
 ```
@@ -63,3 +63,7 @@ cd ..
 cd app/
 streamlit run home.py
 ```
+
+## Deployement :airplane:
+You can find the deployed application: https://luciegaba-sentiment-analysis-tripadvisor-appmain-njj9d8.streamlit.app/
+
