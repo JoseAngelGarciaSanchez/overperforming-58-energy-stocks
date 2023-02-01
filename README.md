@@ -65,5 +65,5 @@ streamlit run home.py
 ```
 
 ## Deployement :airplane:
-You can find the deployed application: https://luciegaba-sentiment-analysis-tripadvisor-appmain-njj9d8.streamlit.app/
+You can find the deployed application: https://pse1234-sentimental-analysis-energy-stocks-apphome-cnk6h4.streamlit.app/
 
