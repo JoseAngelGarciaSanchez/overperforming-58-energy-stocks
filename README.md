@@ -1,4 +1,4 @@
-# Overperforming 58 energy stocks
+# Overperforming 58 energy stocks :fuelpump:
 
 ## Introduction 
 When rational arbitrageurs have limited risk-bearing capacity and time horizons, the actions of irrational noise traders can affect asset prices (De Long, Shleifer, Summers, & Waldmann, 1990a). Such actions can be interpreted as being driven by fluctuating investor sentiment. This creates the possibility of trading profitably on the basis of investor sentiment, most obviously by being a contrarian, but, under some circumstances, it may be rational to “jump on the bandwagon” and bet with, rather than against, noise traders (De Long, Shleifer, Summers, & Waldmann, 1990b). Various proxies for investor sentiment have been proposed (Baker & Wurgler, 2006), but perhaps the most direct way to measure sentiment in the stock market is to analyze the words of those who are commenting on stocks. One traditional source of such comments is stories in the news media (Tetlock, 2007). More recently, Google searches and Twitter feeds have been used (Mao, Counts, & Bollen, 2015). 
