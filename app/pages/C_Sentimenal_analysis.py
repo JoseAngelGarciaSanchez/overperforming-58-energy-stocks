@@ -5,9 +5,9 @@ import pandas as pd
 DATE_COLUMN = "DATE"
 DATA_PATH = "./../data/stocks_data.xlsx"
 TWEETS_PREDICTED_PATH = [
-    "./../data_model/webscraped_FMC_CORP.csv",
-    "./../data_model/webscraped_WEYERHAEUSER_CO.csv",
-    "./../data_model/webscraped_BP_PLC.csv",
+    "./../data/data_model/webscraped_FMC_CORP.csv",
+    "./../data/data_model/webscraped_WEYERHAEUSER_CO.csv",
+    "./../data/data_model/webscraped_BP_PLC.csv",
 ]
 
 # Layout
@@ -22,7 +22,7 @@ st.subheader(
 )
 
 
-@st.cache
+@st.cache_data
 def load_predicted_data():
     returns = pd.read_excel(DATA_PATH, sheet_name="Returns", header=[5, 6]).T.iloc[
         2:, :

@@ -14,7 +14,7 @@ DATE_COLUMN = "DATE"
 DATA_PATH = "./../data/stocks_data.xlsx"
 
 
-@st.cache
+@st.cache_data
 def load_data():
     data = pd.read_excel(DATA_PATH, sheet_name="Returns", header=[5, 6]).T.iloc[2:, :]
     data = data.rename(columns=data.iloc[0])
