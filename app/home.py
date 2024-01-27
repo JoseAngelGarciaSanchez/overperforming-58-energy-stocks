@@ -7,11 +7,11 @@ from PIL import Image
 
 # Global Variables
 DATE_COLUMN = "DATE"
-DATA_PATH = "./../data/stocks_data.xlsx"
+DATA_PATH = "./data/stocks_data.xlsx"
 RAW_TWEETS_PATH = [
-    "./../data/webscraped_FMC_CORP.csv",
-    "./../data/webscraped_WEYERHAEUSER_CO.csv",
-    "./../data/webscraped_BP_PLC.csv",
+    "./data/webscraped_FMC_CORP.csv",
+    "./data/webscraped_WEYERHAEUSER_CO.csv",
+    "./data/webscraped_BP_PLC.csv",
 ]
 
 # Layout
@@ -35,7 +35,7 @@ stock_list = [
     "newmont",
 ]
 for i, stock in enumerate(stock_list):
-    logo_path = f"images/{stock}-logo.png"
+    logo_path = f"./app/images/{stock}-logo.png"
     if i == 0:
         c1.image(Image.open(logo_path))
     elif i == 1:
@@ -54,7 +54,7 @@ for i, stock in enumerate(stock_list):
 
 st.subheader("Presentation Twitter")
 st.write(
-    """    
+    """
     Twitter is a social media platform that allows users to post short messages, called tweets, which can contain text, images, and videos. These tweets can be viewed by other users, who can also interact with them by replying, re-tweeting, or liking them.
     From a web scraping point of view, Twitter can be accessed through its website, which is built using a combination of HTML, CSS, and JavaScript. To scrape data from Twitter, one would need to send HTTP requests to the Twitter server, which would return the HTML of the webpage. This HTML can then be parsed using a library such as Selenium to extract the desired data, such as tweets, 
     user information, and follower counts.
@@ -94,7 +94,7 @@ st.dataframe(tweets.head())
 
 st.subheader("Methodology")
 st.write(
-    """    
+    """
     The webscrapped dataset is then preprocessed and cleaned by a script in the folder. We're then doing an exploratory analysis and finally implementing a sentiment analysis model.
     We're implementing two pre-trained models to our webscrapped and preprocessed dataframe : 
 

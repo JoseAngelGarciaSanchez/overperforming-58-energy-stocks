@@ -1,47 +1,57 @@
-# Libraries
-import streamlit as st
-import pandas as pd
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-from nltk.corpus import stopwords
-import seaborn as sns
-import plotly.express as px
+import os
 from collections import Counter
-import numpy as np
+
+import matplotlib.pyplot as plt
+import nltk
+from nltk.corpus import stopwords
+import pandas as pd
+from PIL import Image
+import plotly.express as px
+import seaborn as sns
+import streamlit as st
+from wordcloud import WordCloud
+
 
 # Global Variables
 DATE_COLUMN = "DATE"
-DATA_PATH = "./../data/stocks_data.xlsx"
+DATA_PATH = "./data/stocks_data.xlsx"
 TWEETS_PATH = [
-    "./../data/data_cleaned/webscraped_FMC_CORP.csv/part-00000-9fe4bf5d-f913-4d0c-a98a-8f1d088639ee-c000.csv",
-    "./../data/data_cleaned/webscraped_WEYERHAEUSER_CO.csv/part-00000-17a4305d-9672-4ddf-87fc-d180dcf01612-c000.csv",
-    "./../data/data_cleaned/webscraped_BP_PLC.csv/part-00000-60047cdf-7f10-49f8-932e-065bb69f747c-c000.csv",
+    "./data/data_cleaned/webscraped_BP_PLC/part-00000-624ba115-e5ef-4814-bbab-b72bfb1a9217-c000.csv",
+    "./data/data_cleaned/webscraped_FMC_CORP/part-00000-ea27d81f-27be-4e5a-9cc2-88ccb53607a7-c000.csv",
+    "./data/data_cleaned/webscraped_WEYERHAEUSER_CO/part-00000-5305ef13-248d-49c3-a77a-ae3f402be90c-c000.csv",
+    "./data/data_cleaned/webscraped_ALTAGAS_LTD/part-00000-3421db26-ad9d-4523-a3dc-8c280f59d6f6-c000.csv",
+    "./data/data_cleaned/webscraped_BHP_GROUP/part-00000-cf4ae556-1c5b-4645-890e-822a2fbe66ef-c000.csv",
+    # "./data/data_cleaned/webscraped_INTERNATIONAL_PAPER_CO/part-00000-d86fb744-c8ac-41a3-ad2b-6706f75f5abd-c000.csv",
+    # "./data/data_cleaned/webscraped_STORA_ENSO/part-00000-d8bcad1c-da20-44e1-857c-50bbfd37d66b-c000.csv",
+    # "./data/data_cleaned/webscraped_WILMAR_INTERNATIONAL_LTD/part-00000-4ab531e0-1dbd-46e2-a9d5-6102930b494f-c000.csv",
+    # "./data/data_cleaned/webscraped_S&P_500_ENERGY_INDEX/part-00000-30e199c7-87e1-4788-81bb-39b48a1df96e-c000.csv",
 ]
 
+nltk.download('stopwords')
+
 # Layout
+twt_logo = Image.open('./app/images/twitter-logo.png')
 st.set_page_config(
-    page_title="Tweets analysis for stocks", page_icon=":bar_chart:", layout="wide"
+    page_title="Tweets analysis for stocks", page_icon=twt_logo, layout="wide"
 )
-st.title("Tweets analysis for stocks 📈📉")
-
-# Style
-with open("style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.title("Tweets exploratory data analysis 🐦")
 
 
-@st.cache_data
+@st.cache
 def load_data():
     returns = pd.read_excel(DATA_PATH, sheet_name="Returns", header=[5, 6]).T.iloc[
         2:, :
     ]
     returns = returns.rename(columns=returns.iloc[0])
     returns = returns.iloc[2:]
-    upercase = lambda x: str(x).upper()
+    def upercase(x): return str(x).upper()
     returns.rename(upercase, axis="columns", inplace=True)
     returns.reset_index(inplace=True)
-    returns.rename(columns={"level_0": "DATE1", "level_1": "DATE"}, inplace=True)
+    returns.rename(columns={"level_0": "DATE1",
+                   "level_1": "DATE"}, inplace=True)
     returns.drop(columns="DATE1", inplace=True)
     returns[DATE_COLUMN] = pd.to_datetime(returns[DATE_COLUMN]).dt.date
+    
     # we add fmc webscrapped data
     fmc_tweets = pd.read_csv(TWEETS_PATH[0])
     fmc_tweets["company"] = "FMC CORP"
@@ -52,14 +62,37 @@ def load_data():
     bp_tweets = pd.read_csv(TWEETS_PATH[2])
     bp_tweets["company"] = "BP PLC"
     tweets = pd.concat([fmc_tweets, wy_tweets, bp_tweets])
+
     tweets["PostDate"] = pd.to_datetime(tweets["PostDate"]).dt.date
     # we add a column with the length of each tweet
-    tweets["tweet_length"] = tweets["TweetText"].apply(lambda x: len(x.split()))
+    tweets["tweet_length"] = tweets["TweetText"].apply(
+        lambda x: len(x.split()))
     tweets["avg_word_length"] = tweets["TweetText"].apply(
         lambda x: sum(len(word) for word in x.split()) / len(x.split())
     )
-    return returns, tweets
+    # dfs = [] 
+    # for dirpath, dirnames, filenames in os.walk("./data/data_cleaned/"):
+    #     for filename in filenames:
+    #         if filename.endswith('.csv'):
+    #             file_path = os.path.join(dirpath, filename)
+    #             st.write(file_path)
+    #             company_name = file_path.split('/')[-2].split('_')[-2:]
+    #             company_name = ' '.join(company_name).upper()
+    #             st.write(company_name)
+    #             df = pd.read_csv(file_path)
+    #             df['company'] = company_name
+    #             dfs.append(df)
 
+    # df_final = pd.concat(dfs, ignore_index=True)
+
+    # df_final["PostDate"] = pd.to_datetime(df_final["PostDate"]).dt.date
+    # # we add a column with the length of each tweet
+    # df_final["tweet_length"] = df_final["TweetText"].apply(
+    #     lambda x: len(x.split()))
+    # df_final["avg_word_length"] = df_final["TweetText"].apply(
+    #     lambda x: sum(len(word) for word in x.split()) / len(x.split())
+    # )
+    return returns, tweets
 
 returns, tweets = load_data()
 
@@ -67,12 +100,24 @@ stocklist = [
     "BP PLC",
     "FMC CORP",
     "WEYERHAEUSER CO",
+    "ALTAGAS LTD",
+    # "BHP GROUP LTD-SPON ADR",
+    # "INTERNATIONAL PAPER CO",
+    # "S&P 500 ENERGY INDEX",
+    # "STORA ENSO OYJ-R SHS",
+    # "WILMAR INTERNATIONAL LTD",
 ]
 
 df_columns_list = [
     "BP/ LN Equity",
     "FMC US Equity",
     "WY US Equity",
+    "ALA CT Equity",
+    # "BHP US Equity",
+    # "IP US Equity",
+    # "S5ENRS Index",
+    # "STERV FH Equity",
+    # "WIL SP Equity",
 ]
 
 search_dictio = {}
@@ -80,32 +125,23 @@ for i, k in enumerate(df_columns_list):
     search_dictio[stocklist[i]] = k
 
 
-# Filter the stocks
-options = st.multiselect(
-    "**Select your desired blockchains:**",
-    options=stocklist,
-    default=None,
-    key="macro_options",
-)
+# -- Choose stocks from stockslists
+container = st.sidebar.container()
+all = st.sidebar.checkbox("Select all")
+if all:
+    options = container.multiselect("**Select one or more stocks:**", stocklist, stocklist[:3])
+else:
+    options =  container.multiselect("**Select one or more stocks:**", stocklist, max_selections=3)
 
 min_date = tweets["PostDate"].min()
 max_date = tweets["PostDate"].max()
 
-# filter start date
-start_date = st.date_input(
-    "**Select a start date:**",
-    min_value=min_date,
-    max_value=max_date,
-    value=min_date,
-    key="start_date",
+
+start_date = st.sidebar.date_input(
+    "**Start date**:", min_value=min_date, max_value=max_date, value=min_date, key="start_date",
 )
-# filter end date
-end_date = st.date_input(
-    "**Select an end date:**",
-    min_value=min_date,
-    max_value=max_date,
-    value=max_date,
-    key="end_date",
+end_date = st.sidebar.date_input(
+    "**End date:**", min_value=min_date, max_value=max_date, value=max_date, key="end_date",
 )
 
 condition1 = start_date <= tweets["PostDate"]
@@ -117,6 +153,8 @@ filtered_tweets = tweets.loc[mask, :]
 stop_words = set(stopwords.words("english"))
 
 # Create a function to check if a word starts with a number
+
+
 def starts_with_number(word):
     return word[0].isdigit()
 
@@ -184,70 +222,6 @@ def treemap(filter_tw, number):
     st.plotly_chart(fig)
 
 
-def word_donut_plot(df, number):
-    all_words = " ".join(df["TweetText"]).split()
-
-    # Filter out the stop words and words starting with numbers
-    all_words = [
-        word
-        for word in all_words
-        if (word.lower() not in stop_words) and (not starts_with_number(word))
-    ]
-
-    # Count the number of occurrences of each word
-    word_counts = Counter(all_words)
-
-    # Get the unique words and their counts
-    unique_words = dict(word_counts)
-
-    # Sort the dictionary by values (word counts) in descending order
-    unique_words = dict(
-        sorted(unique_words.items(), key=lambda item: item[1], reverse=True)
-    )
-
-    # Keep the first n items where n is the number of items you want to keep
-    unique_words = dict(list(unique_words.items())[:number])
-
-    # Plot the donut chart
-    fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
-
-    data = list(unique_words.values())
-
-    wedges, texts = ax.pie(data, wedgeprops=dict(width=0.5), startangle=-40)
-
-    bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-    kw = dict(
-        xycoords="data",
-        textcoords="data",
-        arrowprops=dict(arrowstyle="-"),
-        bbox=bbox_props,
-        zorder=0,
-        va="center",
-    )
-
-    for i, p in enumerate(wedges):
-        ang = (p.theta2 - p.theta1) / 2.0 + p.theta1
-        y = np.sin(np.deg2rad(ang))
-        x = np.cos(np.deg2rad(ang))
-        horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
-        connectionstyle = "angle,angleA=0,angleB={}".format(ang)
-        kw["arrowprops"].update({"connectionstyle": connectionstyle})
-        kw["va"] = "center"
-        ax.annotate(
-            list(unique_words.keys())[i],
-            xy=(x, y),
-            xytext=(1.7 * np.sign(x), 1.7 * y),
-            horizontalalignment=horizontalalignment,
-            **kw,
-        )
-
-    ax.set_title(f"Unique words in tweets for {options[number]}")
-
-    plt.show()
-
-    st.plotly_chart(fig)
-
-
 if len(options) == 0:
     st.warning("Please select at least one stock to see the metrics.")
 
@@ -299,7 +273,8 @@ elif len(options) == 1:
     treemap(filtered_tweets, 0)
 
 elif len(options) == 2:
-    st.subheader(f'Analytics for {", ".join(options)} from {start_date} to {end_date}')
+    st.subheader(
+        f'Analytics for {", ".join(options)} from {start_date} to {end_date}')
     c1, c2 = st.columns(2)
 
     with c1:
@@ -331,7 +306,8 @@ elif len(options) == 2:
         wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
         plt.figure(figsize=(10, 5))
         plt.imshow(wordcloud, interpolation="bilinear")
-        plt.title(f"Wordcloud for {options[0]} from {start_date} to {end_date}")
+        plt.title(
+            f"Wordcloud for {options[0]} from {start_date} to {end_date}")
         plt.axis("off")
         plt.show()
 
@@ -369,7 +345,8 @@ elif len(options) == 2:
         wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
         plt.figure(figsize=(10, 5))
         plt.imshow(wordcloud, interpolation="bilinear")
-        plt.title(f"Wordcloud for {options[0]} from {start_date} to {end_date}")
+        plt.title(
+            f"Wordcloud for {options[0]} from {start_date} to {end_date}")
         plt.axis("off")
         plt.show()
 
@@ -388,7 +365,8 @@ elif len(options) == 2:
     treemap(filtered_tweets_2, 1)
 
 elif len(options) == 3:
-    st.subheader(f'Analytics for {", ".join(options)} from {start_date} to {end_date}')
+    st.subheader(
+        f'Analytics for {", ".join(options)} from {start_date} to {end_date}')
     c1, c2, c3 = st.columns(3)
 
     with c1:
@@ -420,7 +398,8 @@ elif len(options) == 3:
         wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
         plt.figure(figsize=(10, 5))
         plt.imshow(wordcloud, interpolation="bilinear")
-        plt.title(f"Wordcloud for {options[0]} from {start_date} to {end_date}")
+        plt.title(
+            f"Wordcloud for {options[0]} from {start_date} to {end_date}")
         plt.axis("off")
         plt.show()
 
@@ -458,7 +437,8 @@ elif len(options) == 3:
         wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
         plt.figure(figsize=(10, 5))
         plt.imshow(wordcloud, interpolation="bilinear")
-        plt.title(f"Wordcloud for {options[1]} from {start_date} to {end_date}")
+        plt.title(
+            f"Wordcloud for {options[1]} from {start_date} to {end_date}")
         plt.axis("off")
         plt.show()
 
@@ -497,7 +477,8 @@ elif len(options) == 3:
             wordcloud = WordCloud(stopwords=stop_words).generate(tweet_string)
             plt.figure(figsize=(10, 5))
             plt.imshow(wordcloud, interpolation="bilinear")
-            plt.title(f"Wordcloud for {options[2]} from {start_date} to {end_date}")
+            plt.title(
+                f"Wordcloud for {options[2]} from {start_date} to {end_date}")
             plt.axis("off")
             plt.show()
             st.pyplot(plt)
@@ -515,7 +496,3 @@ elif len(options) == 3:
     treemap(filtered_tweets_1, 0)
     treemap(filtered_tweets_2, 1)
     treemap(filtered_tweets_3, 2)
-
-    word_donut_plot(filtered_tweets_1, 0)
-    word_donut_plot(filtered_tweets_2, 1)
-    word_donut_plot(filtered_tweets_3, 2)
