@@ -1,4 +1,3 @@
-import os
 from collections import Counter
 
 import matplotlib.pyplot as plt
@@ -37,7 +36,7 @@ st.set_page_config(
 st.title("Tweets exploratory data analysis 🐦")
 
 
-@st.cache
+@st.cache_data
 def load_data():
     returns = pd.read_excel(DATA_PATH, sheet_name="Returns", header=[5, 6]).T.iloc[
         2:, :
@@ -51,7 +50,7 @@ def load_data():
                    "level_1": "DATE"}, inplace=True)
     returns.drop(columns="DATE1", inplace=True)
     returns[DATE_COLUMN] = pd.to_datetime(returns[DATE_COLUMN]).dt.date
-    
+
     # we add fmc webscrapped data
     fmc_tweets = pd.read_csv(TWEETS_PATH[0])
     fmc_tweets["company"] = "FMC CORP"
@@ -70,7 +69,7 @@ def load_data():
     tweets["avg_word_length"] = tweets["TweetText"].apply(
         lambda x: sum(len(word) for word in x.split()) / len(x.split())
     )
-    # dfs = [] 
+    # dfs = []
     # for dirpath, dirnames, filenames in os.walk("./data/data_cleaned/"):
     #     for filename in filenames:
     #         if filename.endswith('.csv'):
@@ -93,6 +92,7 @@ def load_data():
     #     lambda x: sum(len(word) for word in x.split()) / len(x.split())
     # )
     return returns, tweets
+
 
 returns, tweets = load_data()
 

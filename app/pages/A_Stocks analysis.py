@@ -9,20 +9,20 @@ st.title("💸💸 Stock Analysis based on returns on % 💸💸")
 
 # Global Variables
 DATE_COLUMN = "DATE"
-DATA_PATH = "./data/stocks_data.xlsx"
+DATA_PATH = "./data/"
 
 
 @st.cache_data
 def load_data():
-    data = pd.read_excel(DATA_PATH, sheet_name="Returns", header=[5, 6]).T.iloc[2:, :]
-    data = data.rename(columns=data.iloc[0])
-    data = data.iloc[2:]
-    data.rename(lambda x: str(x).upper(), axis="columns", inplace=True)
-    data.reset_index(inplace=True)
-    data.rename(columns={"level_0": "DATE1", "level_1": "DATE"}, inplace=True)
-    data.drop(columns="DATE1", inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN]).dt.date
-    return data
+    df = pd.read_excel(f"{DATA_PATH}stocks_data.xlsx", sheet_name="Returns", header=[5, 6]).T.iloc[2:, :]
+    df = df.rename(columns=df.iloc[0])
+    df = df.iloc[2:]
+    df.rename(lambda x: str(x).upper(), axis="columns", inplace=True)
+    df.reset_index(inplace=True)
+    df.rename(columns={"level_0": "DATE1", "level_1": "DATE"}, inplace=True)
+    df.drop(columns="DATE1", inplace=True)
+    df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN]).dt.date
+    return df
 
 
 # Load data into the dataframe
