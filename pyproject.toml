@@ -16,6 +16,7 @@ plotly = "^5.18.0"
 wordcloud = "^1.9.3"
 nltk = "^3.8.1"
 seaborn = "^0.13.2"
+transformers = "^4.37.1"
 
 
 [build-system]
