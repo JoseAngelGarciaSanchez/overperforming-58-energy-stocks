@@ -65,7 +65,7 @@ st.write(
 st.subheader("Example of webscrapped dataset")
 
 
-@st.cache
+@st.cache_data
 def load_data():
     returns = pd.read_excel(DATA_PATH, sheet_name="Returns", header=[5, 6]).T.iloc[
         2:, :
