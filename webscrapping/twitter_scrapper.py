@@ -14,10 +14,11 @@ import urllib.parse
 
 class TwitterScrapper:
     """
+    LAST COMMENT (2024-01-27): Unusable, Twitter (X now) changed everything :( 
     LAST MODIFIED:
         2023-01-26
     AUTHORS GITHUB:
-        @Pse1234, @sarrabenyahia
+        @sarrabenyahia, @JoseAngelGarciaSanchez
 
     A simple twitter webscrapper based on selenium
     It enables you to get data from what you are interesed of, for example: "TOTALENERGIES"
@@ -54,7 +55,9 @@ class TwitterScrapper:
 
     Note:
     -----
-    Keep in mind that accessing to an account allows you to get extra data. The algorithm is constructed to avoid all the bot detections systems of twitter. We have test it for a thousand of times.
+    Keep in mind that accessing to an account allows you to get extra data. 
+    The algorithm is constructed to avoid all the bot detections systems of twitter. 
+    We tested it a thousand of times.
     If some of the xpath don't match anymore because twitter have changed their webpage,
     you can adapt them: inspect the element of the webpage and copy the xpath.
     Sometimes, you will have an error, you have to re-run the algorithm for great work.
@@ -86,7 +89,8 @@ class TwitterScrapper:
     def _get_tweet_data(self, card):
         """Extract data from tweet card"""
         try:
-            handle = card.find_element("xpath", './/span[contains(text(), "@")]').text
+            handle = card.find_element(
+                "xpath", './/span[contains(text(), "@")]').text
         except NoSuchElementException:
             return
         try:
@@ -94,15 +98,18 @@ class TwitterScrapper:
         except NoSuchElementException:
             return
         try:
-            postdate = card.find_element("xpath", ".//time").get_attribute("datetime")
+            postdate = card.find_element(
+                "xpath", ".//time").get_attribute("datetime")
         except NoSuchElementException:
             return
         try:
-            comment = card.find_element("xpath", ".//div[2]/div[2]/div[1]").text
+            comment = card.find_element(
+                "xpath", ".//div[2]/div[2]/div[1]").text
         except NoSuchElementException:
             return
         try:
-            responding = card.find_element("xpath", ".//div[2]/div[2]/div[2]").text
+            responding = card.find_element(
+                "xpath", ".//div[2]/div[2]/div[2]").text
         except NoSuchElementException:
             return
         try:
@@ -110,7 +117,8 @@ class TwitterScrapper:
         except NoSuchElementException:
             return
         try:
-            reply_cnt = card.find_element("xpath", './/div[@data-testid="reply"]').text
+            reply_cnt = card.find_element(
+                "xpath", './/div[@data-testid="reply"]').text
         except NoSuchElementException:
             return
         try:
@@ -121,11 +129,13 @@ class TwitterScrapper:
         except NoSuchElementException:
             return
         try:
-            like_cnt = card.find_element("xpath", './/div[@data-testid="like"]').text
+            like_cnt = card.find_element(
+                "xpath", './/div[@data-testid="like"]').text
             # like_cnt = card.find_element('xpath','.//div[@data-testid="like"]').text
         except NoSuchElementException:
             return
-        tweet = (username, handle, postdate, text, reply_cnt, retweet_cnt, like_cnt)
+        tweet = (username, handle, postdate, text,
+                 reply_cnt, retweet_cnt, like_cnt)
         return tweet
 
     def _open_set_up_chrome(self):
@@ -253,7 +263,8 @@ class TwitterScrapper:
         sleep(random.choice(self.list_seconds))
 
     def _collect_all_tweets_from_current_view(self, driver, lookback_limit=25):
-        page_cards = driver.find_elements("xpath", '//article[@data-testid="tweet"]')
+        page_cards = driver.find_elements(
+            "xpath", '//article[@data-testid="tweet"]')
         if self.verbose:
             print("Good for collecting all tweets")
         if len(page_cards) <= lookback_limit:
@@ -275,14 +286,16 @@ class TwitterScrapper:
         flag will be returned as `True`"""
         end_of_scroll_region = False
 
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);")
         sleep(random.choice(self.list_seconds))
         curr_position = driver.execute_script("return window.pageYOffset;")
         if curr_position == last_position:
             if scroll_attempt < max_attempts:
                 end_of_scroll_region = True
             else:
-                _scroll_down_page(last_position, curr_position, scroll_attempt + 1)
+                _scroll_down_page(
+                    last_position, curr_position, scroll_attempt + 1)
         last_position = curr_position
         if self.verbose:
             print("good for scrolling down the page")
