@@ -1,5 +1,5 @@
 import os
-
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
@@ -289,6 +289,39 @@ class ModelEvaluationMonth:
         # Print the updated correlation results
         for company, corr_value in correlation_results.items():
             print(f"{company} Signal-Market Correlation: {corr_value}")
+            
+    def visualize_courbe(self):        
+        evaluation_df = self.shortlongdf.join(
+            self.adjusted_returns, how="inner", lsuffix="_buysell", rsuffix="_market"
+        )
+
+        unique_stocks = set(col.split("_buysell")[0] for col in evaluation_df.columns if "_buysell" in col)
+        
+        for stock in unique_stocks:
+            buysell_col = stock + "_buysell"
+            market_col = stock + "_market"
+            
+            if buysell_col in evaluation_df.columns and market_col in evaluation_df.columns:
+                fig, ax1 = plt.subplots(figsize=(14, 7))
+
+                color = 'tab:blue'
+                ax1.set_xlabel('Date')
+                ax1.set_ylabel('Signal', color=color)
+                smoothed_signal = evaluation_df[buysell_col]
+                ax1.plot(evaluation_df.index, smoothed_signal, label='Smoothed Signal', color=color, alpha=0.7)
+                ax1.tick_params(axis='y', labelcolor=color)
+
+                ax2 = ax1.twinx()
+                color = 'tab:red'
+                ax2.set_ylabel('Market Return', color=color)
+                smoothed_market_return = evaluation_df[market_col]
+                ax2.plot(evaluation_df.index, smoothed_market_return, label='Smoothed Market Return', color=color, alpha=0.7)
+                ax2.tick_params(axis='y', labelcolor=color)
+
+                fig.tight_layout()
+                plt.title(f"Smoothed Signal vs Market Return for {stock}")
+                plt.savefig(f"{stock}_smoothed_signal_vs_market_return.png")
+                plt.close() 
 
     def launch(self):
         self.read_data()
@@ -298,7 +331,7 @@ class ModelEvaluationMonth:
         self.adjust_returns_with_company_names()
         self.evaluate_model_accuracy()
         self.compute_signal_market_correlation()
-
+        self.visualize_courbe()
 
 class DailyModelEvaluation:
     def __init__(
@@ -317,7 +350,8 @@ class DailyModelEvaluation:
         self.df_returns = self.df_returns / 100
 
         # Week-end
-        nan_index = self.df_returns.index[self.df_returns.isna().all(axis=1)]
+        nan_mask = self.df_returns.isna().all(axis=1)
+        self.df_returns = self.df_returns.loc[~nan_mask, :]
         
     def _correlation_by_company(
         self,
@@ -325,12 +359,13 @@ class DailyModelEvaluation:
         """
         by : day, month, year
         """
+        self.convert_dict = self.__mapping()
+
         self.positive_daily_ratios = self.__group_model_results(
             df=self.df_model_results
         )
 
         self.adjusted_returns = self.__adjust_returns_with_company_names()
-
 
     def __format_model_results(self, df):
         # Format PostDate to datetime
@@ -434,10 +469,11 @@ class DailyModelEvaluation:
         """
         Adapt returns names to company names
         """
-        convert_dict = self.__mapping()
 
-        selected_columns = [value for value in convert_dict.values() if value in self.df_returns.columns]
+        selected_columns = [value for value in self.convert_dict.values() if value in self.df_returns.columns]
         selected_returns = self.df_returns.loc[:, selected_columns]
+        
+        selected_returns.rename(columns={v:k for k, v in self.convert_dict.items()}, inplace=True)
         selected_returns = selected_returns.reset_index().rename(columns={'index':'date'})
 
         return selected_returns
@@ -466,35 +502,29 @@ class DailyModelEvaluation:
             stock_ratios.loc[:, "buy_or_sell"] = (
                 stock_ratios["positive_ratio_shifted"] - 0.5
             ) * 2
-            
-            print(stock_ratios['buy_or_sell'].agg(['min', 'max']))
+
             # STOCK_RATIONS BETWEEN -1 and 1
             stock_ratios.set_index("yearmonthday", inplace=True)
 
             self.stock_ratios = stock_ratios
             # saving info in a dataframe
             self.shortlongdf[company] = stock_ratios["buy_or_sell"]
-
+ 
     def evaluate_model_accuracy(self):
-        self.adjusted_returns.index = pd.to_datetime(self.adjusted_returns.index)
+        self.adjusted_returns.index = pd.to_datetime(self.adjusted_returns['date'])
         self.shortlongdf.index = pd.to_datetime(self.shortlongdf.index)
-
-        # ICI IL FAUT FAIRE LE TRUC DE PEPE
-        print(self.adjusted_returns)
-        print(self.shortlongdf)
-
+        
         evaluation_df = self.shortlongdf.join(
             self.adjusted_returns, how="inner", lsuffix="_buysell", rsuffix="_market"
         )
         accuracy_metrics = {}
 
         def prediction_matches(signal, market_return):
-            # First, ensure both signal and market_return are not NaT or NaN by checking if they're numeric
-            if signal > 0 and market_return > 1:
+            if signal > 0.5 and market_return > 0:
                 return True
-            elif signal < 0 and market_return < 1:
+            elif signal < 0.5 and market_return < 0:
                 return True
-            elif -0.1 < signal < 0.1 and 0.9 < market_return < 1.1:
+            elif -0.5 <= signal <= 0.5 and -0.05 <= market_return <= 0.05:
                 return True
             else:
                 return False
@@ -535,15 +565,12 @@ class DailyModelEvaluation:
 
         correlation_results = {}
 
-        # Iterate over columns to compute correlations
         for column in evaluation_df.columns:
             if "_signal" in column:
                 signal_column = column
                 market_column = column.replace("_signal", "_market")
 
-                # Check if the corresponding market column exists
                 if market_column in evaluation_df.columns:
-                    # Clean data: remove rows where either column has NaN or inf values
                     clean_df = (
                         evaluation_df[[signal_column, market_column]]
                         .replace([np.inf, -np.inf], np.nan)
@@ -551,7 +578,6 @@ class DailyModelEvaluation:
                     )
 
                     if not clean_df.empty:
-                        # Compute the correlation and its p-value
                         signal_data = clean_df[signal_column]
                         market_data = clean_df[market_column]
                         if len(signal_data) < 2 or len(market_data) < 2:
@@ -561,27 +587,62 @@ class DailyModelEvaluation:
 
                         company_name = column.split("_signal")[0]
 
-                        # Format the correlation value and include significance if p-value < 0.05
                         significance = "***" if p_value < 0.05 else ""
                         formatted_correlation = f"{corr:.4f} {significance}"
 
                         correlation_results[company_name] = formatted_correlation
 
-        # Print the updated correlation results
         for company, corr_value in correlation_results.items():
             print(f"{company} Signal-Market Correlation: {corr_value}")
 
-    def compute_model_evaluation(self):
+
+    def visualize_courbe(self):        
+        evaluation_df = self.shortlongdf.join(
+            self.adjusted_returns, how="inner", lsuffix="_buysell", rsuffix="_market"
+        )
+
+        def moving_average(data, window_size):
+            return data.rolling(window=window_size, min_periods=1).mean()
+
+        unique_stocks = set(col.split("_buysell")[0] for col in evaluation_df.columns if "_buysell" in col)
+        
+        for stock in unique_stocks:
+            buysell_col = stock + "_buysell"
+            market_col = stock + "_market"
+            
+            if buysell_col in evaluation_df.columns and market_col in evaluation_df.columns:
+                fig, ax1 = plt.subplots(figsize=(14, 7))
+
+                color = 'tab:blue'
+                ax1.set_xlabel('Date')
+                ax1.set_ylabel('Signal', color=color)
+                smoothed_signal = moving_average(evaluation_df[buysell_col], window_size=5)
+                ax1.plot(evaluation_df.index, smoothed_signal, label='Smoothed Signal', color=color, alpha=0.7)
+                ax1.tick_params(axis='y', labelcolor=color)
+
+                ax2 = ax1.twinx()
+                color = 'tab:red'
+                ax2.set_ylabel('Market Return', color=color)
+                smoothed_market_return = moving_average(evaluation_df[market_col], window_size=5)
+                ax2.plot(evaluation_df.index, smoothed_market_return, label='Smoothed Market Return', color=color, alpha=0.7)
+                ax2.tick_params(axis='y', labelcolor=color)
+
+                fig.tight_layout()
+                plt.title(f"Smoothed Signal vs Market Return for {stock}")
+                plt.savefig(f"{stock}_smoothed_signal_vs_market_return.png")
+                plt.close() 
+
+    def launch(self):
         self._load_process_raw_data()
         self._correlation_by_company()
         self.short_or_long()
-        # self.evaluate_model_accuracy()
-        # self.compute_signal_market_correlation()
+        self.evaluate_model_accuracy()
+        self.compute_signal_market_correlation()
+        self.visualize_courbe()
 
 
 if __name__ == "__main__":
     path = "./../data/data_model/all_data.csv"
-    returns_path = "./../data/stocks_daily_data.xlsx"
-
+    returns_path = "./../data/stocks_daily_data.xlsx" 
     model_evaluator = DailyModelEvaluation(path, returns_path)
-    model_evaluator.compute_model_evaluation()
+    model_evaluator.launch()
