@@ -75,8 +75,8 @@ class TwitterScrapper:
             connection_button.send_keys(mail + Keys.ENTER)
         except NoSuchElementException:
             if self.verbose:
-                print("Mail textbox not finded")
-        driver.implicitly_wait(60)
+                print("Mail textbox not found")
+        sleep(random.randint(2, 4))
 
         # Introduce username
         try:
@@ -88,8 +88,7 @@ class TwitterScrapper:
         except NoSuchElementException:
             if self.verbose:
                 print("Username textbox not finded")
-        
-        driver.implicitly_wait(60)
+        sleep(random.randint(2, 4))
         
         # Introduce password
         try:
@@ -100,11 +99,8 @@ class TwitterScrapper:
             password_textbox.send_keys(password + Keys.ENTER)
         except NoSuchElementException:
             if self.verbose:
-                print("Username textbox not finded")
-        
-        driver.implicitly_wait(60)
-
-        return driver
+                print("Username textbox not found")
+        sleep(random.randint(20, 40))
 
     def _twitter_query(self, driver, query):
         try:
@@ -115,18 +111,44 @@ class TwitterScrapper:
             query_textbox.send_keys(query + Keys.ENTER)
         except NoSuchElementException:
             if self.verbose:
-                print("Query textbox not finded")
-        
-        sleep(random.randint(30, 500))
+                print("Query textbox not found")
 
+    def _get_recents(self, driver):
+        """get recents tweets from the 'lasts' page for recent activity"""
+        try:
+            recent = driver.find_element(
+                "xpath",
+                # '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div[1]/div/div[1]/div[1]/div[2]/nav/div/div[2]/div/div[2]/a/div/div/span',
+                # '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div[1]/div/div[1]/div[1]/div[2]/nav/div/div[2]/div/div[2]/a',
+                '//*[@id="react-root"]/div/div/div[2]/main/div/div/div/div[1]/div/div[1]/div[1]/div[2]/nav/div/div[2]/div/div[2]/a/div/div'
+            )
+            recent.click()
+            if self.verbose:
+                print("good for getting recents tweets")
+        except NoSuchElementException:
+            if self.verbose:
+                print("Recents box not found")
+        sleep(random.randint(2, 4))
+
+    def _collect_all_tweets_from_current_view(self, driver, lookback_limit=25):
+        page_cards = driver.find_elements(
+            "xpath", '//article[@data-testid="tweet"]')
+        if self.verbose:
+            print("Good for collecting all tweets")
+        if len(page_cards) <= lookback_limit:
+            return page_cards
+        else:
+            return page_cards[-lookback_limit:]
 
     def launch_webscrapping(self):
         driver = self._open_set_up_chrome()
         driver = self._open_twitter(driver=driver, link=self.link)
-        driver = self._init_twitter_session(driver=driver)
+        self._init_twitter_session(driver=driver)
         self._twitter_query(driver, query=self.research)
-
+        self._get_recents(driver)
         
+        sleep(random.randint(30, 500))
+
 
 if __name__ == "__main__":
     ts = TwitterScrapper(research="bp plc",verbose=True)
