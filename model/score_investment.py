@@ -290,7 +290,10 @@ class ModelEvaluationMonth:
         for company, corr_value in correlation_results.items():
             print(f"{company} Signal-Market Correlation: {corr_value}")
 
-    def visualize_courbe(self):
+    def visualize_courbe(self, SAVE_PATH: str | os.PathLike):
+
+        os.makedirs(f'{SAVE_PATH}/correlation_curves/', exist_ok=True)
+
         evaluation_df = self.shortlongdf.join(
             self.adjusted_returns, how="inner", lsuffix="_buysell", rsuffix="_market"
         )
@@ -339,7 +342,7 @@ class ModelEvaluationMonth:
 
                 fig.tight_layout()
                 plt.title(f"Smoothed Signal vs Market Return for {stock}")
-                plt.savefig(f"{stock}_smoothed_signal_vs_market_return.png")
+                plt.savefig(f"{SAVE_PATH}/correlation_curves/{stock}_smoothed_signal_vs_market_return.png")
                 plt.close()
 
     def launch(self):
@@ -350,7 +353,7 @@ class ModelEvaluationMonth:
         self.adjust_returns_with_company_names()
         self.evaluate_model_accuracy()
         self.compute_signal_market_correlation()
-        self.visualize_courbe()
+        self.visualize_courbe(SAVE_PATH='./../data/')
 
 
 class DailyModelEvaluation:
@@ -435,11 +438,11 @@ class DailyModelEvaluation:
         ]
         return {k: v for k, v in zip(df_columns_list, stocklist)}
 
-    def __group_model_results(self, df):
+    def __group_model_results(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Grouping model results by
+        Grouping model results
 
-        by : str = ["year", "month", "day", "company"]
+        by: str = ["year", "month", "day", "company"]
         """
         # group the data by year and month
         grouped = df.groupby(["year", "month", "day", "company"])
