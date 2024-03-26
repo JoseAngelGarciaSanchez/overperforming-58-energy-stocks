@@ -1,3 +1,3 @@
-mail="mosefdatascience@gmail.com"
-username="mosefdata"
-password="MosefDataScience@"
+MAIL="mosefdatascience@gmail.com"
+USERNAME="mosefdata"
+PASSWORD="MosefDataScience@"
