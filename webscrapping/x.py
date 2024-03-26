@@ -271,7 +271,7 @@ class TwitterScrapper:
         file_path = (
             f'{save_path}webscraped_{"_".join(self.research.split())}.csv'
         )
-
+        first = False
         if not os.path.exists(file_path):
             os.makedirs(dire_path, exist_ok=True)
             open(file_path, "a").close()
@@ -348,7 +348,12 @@ if __name__ == "__main__":
 
     if os.path.exists(FILE_PATH):
         df = pd.read_csv(FILE_PATH)
-        END_DATE = str(pd.to_datetime(df["PostDate"]).min().date())
+        minimale_date = pd.to_datetime(df["PostDate"]).min().date()
+
+        if pd.notna(minimale_date):
+            END_DATE = str(minimale_date)
+        else:
+            END_DATE = None
     else:
         END_DATE = None
 
