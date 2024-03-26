@@ -1,6 +1,8 @@
 import csv
+from datetime import date
 import os
 import random
+import urllib
 from time import sleep
 
 from selenium import webdriver
@@ -11,7 +13,7 @@ from selenium.common.exceptions import (
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import Chrome
 
-from parameters import mail, username, password
+from parameters import MAIL, USERNAME, PASSWORD
 
 
 class TwitterScrapper:
@@ -23,16 +25,26 @@ class TwitterScrapper:
         self,
         research: str = "Elon musk",
         link: str = "https://twitter.com/i/flow/login",
-        output_path: str = "./../data/",
-        start_date=None,
-        end_date=None,
+
+        start_date: date = None,
+        end_date: date = None,
+
         mail=None,
         username=None,
         password=None,
+
         verbose: bool = False,
+
     ) -> None:
         self.research = research
         self.link = link
+
+        self.start_date = start_date
+        self.end_date = end_date
+
+        self.mail = mail
+        self.username = username
+        self.password = password
 
         self.verbose = verbose
 
@@ -72,7 +84,7 @@ class TwitterScrapper:
                 '//*[@id="layers"]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input',
             )
             connection_button.click()
-            connection_button.send_keys(mail + Keys.ENTER)
+            connection_button.send_keys(self.mail + Keys.ENTER)
         except NoSuchElementException:
             if self.verbose:
                 print("Mail textbox not found")
@@ -84,10 +96,10 @@ class TwitterScrapper:
                 "xpath",
                 '//*[@id="layers"]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div[2]/label/div/div[2]/div/input',
             )
-            username_textbox.send_keys(username + Keys.ENTER)
+            username_textbox.send_keys(self.username + Keys.ENTER)
         except NoSuchElementException:
             if self.verbose:
-                print("Username textbox not finded")
+                print("Username textbox not found")
         sleep(random.randint(2, 4))
 
         # Introduce password
@@ -96,7 +108,7 @@ class TwitterScrapper:
                 "xpath",
                 '//*[@id="layers"]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input',
             )
-            password_textbox.send_keys(password + Keys.ENTER)
+            password_textbox.send_keys(self.password + Keys.ENTER)
         except NoSuchElementException:
             if self.verbose:
                 print("Username textbox not found")
@@ -111,6 +123,25 @@ class TwitterScrapper:
         except NoSuchElementException:
             if self.verbose:
                 print("Query textbox not found")
+
+    def _advanced_link(self, driver, query):
+        """This enables us to search directly by the URL, avoiding many XPATH that could change, it allows you to specify some advanced parameters for the search"""
+        company_name = query
+        encoded_name = urllib.parse.quote(company_name)
+        if self.end_date is not None and self.start_date is not None:
+            advanced_link = f"https://twitter.com/search?f=liveq&={encoded_name}%20until%3A{self.end_date}%20since%3A{self.start_date}&src=typed_query"
+        elif self.end_date is None and self.start_date is not None:
+            advanced_link = f"https://twitter.com/search?f=live&q={encoded_name}%20since%3A{self.start_date}&src=typed_query"
+        elif self.end_date is not None and self.start_date is None:
+            advanced_link = f"https://twitter.com/search?f=live&q={encoded_name}%20until%3A{self.end_date}&src=typed_query"
+        else:
+            advanced_link = (
+                f"https://twitter.com/search?q={encoded_name}&src=typed_query&f=live"
+            )
+        driver.get(advanced_link)
+        if self.verbose:
+            print("good for advanced link")
+        return driver
 
     def _get_recents(self, driver):
         """get recents tweets from the 'lasts' page for recent activity"""
@@ -188,7 +219,7 @@ class TwitterScrapper:
             return page_cards[-lookback_limit:]
 
     def __scroll_down_page(
-        self, driver, last_position, scroll_attempt=0, max_attempts=3
+        self, driver, last_position, scroll_attempt=0, max_attempts=5
     ):
         """The function will try to scroll down the page and will check the current
         and last positions as an indicator. If the current and last positions are the same after `max_attempts`
@@ -204,6 +235,7 @@ class TwitterScrapper:
 
         if curr_position == last_position:
             if scroll_attempt < max_attempts:
+                print(f"max scroll attemps reached: {max_attempts}")
                 end_of_scroll_region = True
             else:
                 self.__scroll_down_page(
@@ -217,8 +249,14 @@ class TwitterScrapper:
 
         return last_position, end_of_scroll_region
 
-    def __save_tweet_data_to_csv(self, records, save_path, mode="a+"):
-        """Saving the data collected into the specified output path with csv format"""
+    def __save_tweet_data_to_csv(
+        self, records, save_path: os.PathLike | str
+    ):
+        """
+        Saving the data collected into the
+        specified save path with csv format
+        """
+
         header = [
             "User",
             "Handle",
@@ -228,27 +266,30 @@ class TwitterScrapper:
             "RetweetCount",
             "LikeCount",
         ]
-        if not os.path.exists(save_path):
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            open(save_path, "w").close()
-            mode = "w"
-        with open(save_path, mode=mode, newline="", encoding="utf-8") as f:
+
+        dire_path = os.path.dirname(save_path)
+        file_path = (
+            f'{save_path}webscraped_{"_".join(self.research.split())}.csv'
+        )
+
+        if not os.path.exists(file_path):
+            os.makedirs(dire_path, exist_ok=True)
+            open(file_path, "a").close()
+            first = True
+        with open(file_path, mode="a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            if mode == "w":
+            if first:
                 writer.writerow(header)
             if records:
                 writer.writerow(records)
 
     def _scroll_and_save(self, driver, save_path):
-        save_path_completed = (
-            f'{save_path}webscraped_{"_".join(self.research.split())}.csv'
-        )
 
         last_position = None
         end_of_scroll_region = False
         unique_tweets = set()
 
-        self.__save_tweet_data_to_csv(None, save_path, "w")
+        self.__save_tweet_data_to_csv(None, save_path)
 
         while not end_of_scroll_region:
             cards = self.__collect_all_tweets_from_current_view(driver)
@@ -277,8 +318,8 @@ class TwitterScrapper:
         driver.quit()
 
     def launch_webscrapping(self, save_path: str | os.PathLike):
-        if not save_path.endswith('/'):
-            save_path += '/'
+        if not save_path.endswith("/"):
+            save_path += "/"
 
         driver = self._open_set_up_chrome()
         driver = self._open_twitter(driver=driver, link=self.link)
@@ -286,7 +327,8 @@ class TwitterScrapper:
         self._init_twitter_session(driver=driver)
         sleep(random.randint(20, 40))
 
-        self._twitter_query(driver, query=self.research)
+        self._advanced_link(driver, query=self.research)
+        # self._twitter_query(driver, query=self.research)
         sleep(random.randint(5, 8))
 
         self._get_recents(driver)
@@ -294,9 +336,31 @@ class TwitterScrapper:
 
         self._scroll_and_save(driver, save_path)
 
-        sleep(random.randint(30, 500))
+        sleep(120)
 
 
 if __name__ == "__main__":
-    ts = TwitterScrapper(research="bp plc", verbose=True)
+    import pandas as pd
+
+    RESEARCH = "bp plc"
+    SAVE_PATH = "./../data/new_webscrapping/"
+    FILE_PATH = f'{SAVE_PATH}webscraped_{"_".join(RESEARCH.split())}.csv'
+
+    if os.path.exists(FILE_PATH):
+        df = pd.read_csv(FILE_PATH)
+        END_DATE = str(pd.to_datetime(df["PostDate"]).min().date())
+    else:
+        END_DATE = None
+
+    print(f'END_DATE: {END_DATE}')
+
+    ts = TwitterScrapper(
+            research="bp plc",
+            mail=MAIL,
+            username=USERNAME,
+            password=PASSWORD,
+            # start_date=,
+            end_date=END_DATE,
+            verbose=True
+        )
     ts.launch_webscrapping(save_path="./../data/new_webscrapping/")
